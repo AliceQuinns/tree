@@ -3,60 +3,64 @@ import Back from './base/bg.js'
 import Tree from './base/tree.js'
 import Npc from './base/npc.js'
 import Gameinfo from './base/gameinfo.js'
+import Audio from './base/audio.js'
+import Tool from './base/tool.js'
 
-let ctx = canvas.getContext('2d')
-let databus = new Databus()
+let ctx = canvas.getContext('2d');
+let audioObj = new Audio();// 创建音频实例
+let databus = new Databus();
+let Tools = new Tool();// 创建工具类
 
-let screenHeight = window.innerHeight
-let screenWidth  = window.innerWidth
+let screenHeight = window.innerHeight;
+let screenWidth  = window.innerWidth;
 
-let treeLeft = "images/treeLeft.png"
-let treeCen = "images/tree.png"
-let treeRight = "images/treeRight.png"
+let treeLeft = "images/treeLeft.png";
+let treeCen = "images/tree.png";
+let treeRight = "images/treeRight.png";
 
-let npcImg = 'images/npc.png'
-let npcMove = 'images/npcMove.png'
-let npcDie = 'images/npcDie.png'
+let npcImg = 'images/npc.png';
+let npcMove = 'images/npcMove.png';
+let npcDie = 'images/npcDie.png';
 
 export default class main{
 	constructor(){
-		this.restart = false
-		this.init()				
+		this.restart = false;
+		this.init();
 	}
 
 	init(){
-		databus.reset()
-		canvas.removeEventListener('touchstart',this.touchHandler)
-		wx.triggerGC()
+		databus.reset();
+		canvas.removeEventListener('touchstart',this.touchHandler);
+		wx.triggerGC();
 		/*降低帧率*/
 		//wx.setPreferredFramesPerSecond(20)
-		this.back = new Back(ctx)	
-		this.npc = new Npc(ctx)		
-		this.gameinfo = new Gameinfo(ctx)
+		this.back = new Back(ctx);
+		this.npc = new Npc(ctx);
+		this.gameinfo = new Gameinfo(ctx);
 					
 		for (var i = 1; i < 12; i++) {
-			let _img = this.randomTree()		
-			let _tree =  databus.pool.getItemByClass('tree',Tree,ctx,_img.img,_img.p)	
+			let _img = this.randomTree();
+			let _tree =  databus.pool.getItemByClass('tree',Tree,ctx,_img.img,_img.p);
 			databus.pushTree(_tree)
 		}
-		this.touch()
+		this.touch();
 		window.requestAnimationFrame(
 	      this.loop.bind(this),
 	      canvas
-	    )
-	    
-				
+	    );
+		// 播放背景音乐
+        audioObj.playMusic(Tools.getRandomInt(0,2)?"bg1":"bg2");
 	}
 
 	run(){			
 		/*计算当前点击位置*/
-		this.collisionDetection()
+		this.collisionDetection();
 		if(databus.gameOver){
 			return
 		}
-		let tap = this.touchX>=screenWidth/2
+		let tap = this.touchX>=screenWidth/2;
 		if (!(this.npc.posi == tap)) {
-			this.npc.posi = !this.npc.posi
+			this.npc.posi = !this.npc.posi;
 			return
 		}		
 
@@ -102,8 +106,8 @@ export default class main{
 
 	/*碰撞检测*/
 	collisionDetection(){
-		let isCollision = (this.npc.posi==databus.trees[0].posiDr)
-		isCollision&&(databus.gameOver = true)&&(this.npc.update(npcDie))
+		let isCollision = (this.npc.posi==databus.trees[0].posiDr);
+		isCollision&&(databus.gameOver = true)&&(this.npc.update(npcDie));
 	}
   	//游戏结束后的触摸事件处理逻辑
 	touchEventHandler(e) {
@@ -138,7 +142,7 @@ export default class main{
 
 	touch(){
 		let that = this;
-		this.touchCuttrees = that.touchCuttree.bind(this) // 更改this指向
+		this.touchCuttrees = that.touchCuttree.bind(this); // 更改this指向
 		canvas.addEventListener('touchstart', this.touchCuttrees)
 	}
 	loop() { 
