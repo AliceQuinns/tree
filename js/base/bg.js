@@ -1,16 +1,16 @@
-let screenHeight = window.innerHeight
-let screenWidth  = window.innerWidth
-
-let bg = new Image()
-bg.src = 'images/bg.jpg'
+let screenHeight = window.innerHeight;
+let screenWidth  = window.innerWidth;
 
 export default class back{
-	constructor(ctx){
-		this.ctx = ctx
+	constructor(ctx,src){
+        let bg = new Image();
+        bg.src = src;
+		this.ctx = ctx;
+		this.bg = bg;
 	}
 
 	render(){
-		var that = this		
-		that.ctx.drawImage(bg,0,0,screenWidth,screenHeight)		
+		let that = this;
+		that.ctx.drawImage(this.bg,0,0,screenWidth,screenHeight);
 	}
 }
