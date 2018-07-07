@@ -24,6 +24,7 @@ export default class databus{
 
 	shiftTree(){
 		let temp = this.trees.shift();
+		// 回收
 	    this.pool.recover('tree', temp);
 	}
 }

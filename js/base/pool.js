@@ -1,6 +1,6 @@
 const __ = {
-  poolDic: Symbol('poolDic')
-}
+  poolDic: Symbol('poolDic')// 不重名属性
+};
 
 export default class Pool {
   constructor() {
@@ -17,13 +17,13 @@ export default class Pool {
 
   getItemByClass(name, className,ctx,img,p) {
 
-    let pool = this.getPoolBySign(name)
-    let result = {}
+    let pool = this.getPoolBySign(name);
+    let result = {};
     if (pool.length) {
-    	result = pool.shift()
+    	result = pool.shift();
     	result.update(img,p)
     }else{
-    	result = new className(ctx,img,p)
+    	result = new className(ctx,img,p);
     }
 
     return result

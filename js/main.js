@@ -31,7 +31,7 @@ let bg = 'images/bg.png';
 
 export default class main{
 	constructor(){
-		this.restart = false;
+        this.gameStart = false;// 游戏运行状态控制
 		this.init();
 	}
 
@@ -44,13 +44,18 @@ export default class main{
 		this.back = new Back(ctx,bg);// 实例化背景对象
 		this.npc = new Npc(ctx,npctexture);// 实例化主角
 		this.gameinfo = new Gameinfo(ctx);// 实例化分数与游戏结束控制
+		this.IndexUI = new Index(ctx);// 实例化indexUI
 
-		for (let i = 1; i < 12; i++) {
-			let _img = this.randomTree();// 随机产生木头
+		// 实例化木头
+		for (let i = 1; i < 15; i++) {
+			let _img = this.randomTree();// 随机产生木头类型
 			let _tree =  databus.pool.getItemByClass('tree',Tree,ctx,_img.img,_img.p);// 对象池请求
 			databus.pushTree(_tree);
 		}
-		this.touch();// 绑定点击事件
+		// 再来一局情况
+		if(this.gameStart){
+            this.touch();// 绑定点击事件
+		}
 		// update
 		window.requestAnimationFrame(
 	      this.loop.bind(this),
@@ -66,19 +71,23 @@ export default class main{
 		if(databus.gameOver){
 			return
 		}
-		let tap = this.touchX>=screenWidth/2;
+		let tap = this.touchX>=screenWidth/2;// 判断鼠标落点
+
+		// 切换主角位置
 		if (!(this.npc.posi == tap)) {
 			this.npc.posi = !this.npc.posi;
 			return
 		}		
 
 		databus.score++;
-		this.npc.blood = (this.npc.blood + 160>=6000)?6000:this.npc.blood+160;
-		/*木头池*/
-		databus.shiftTree(); //弹出
-		let _img = this.randomTree();// 产生木头
+		this.npc.blood = (this.npc.blood + 160>=6000)?6000:this.npc.blood+160;// 添加生命值
+		// 回收木头
+		databus.shiftTree();
+        // 产生新木头
+		let _img = this.randomTree();
 		let _tree =  databus.pool.getItemByClass('tree',Tree,ctx,_img.img,_img.p);
 		databus.pushTree(_tree);
+        this.collisionDetection();// 碰撞检测
 	}
 
 	/*随机产生木头*/
@@ -118,6 +127,39 @@ export default class main{
 		isCollision&&(databus.gameOver = true)&&(this.npc.update(npcDie));
 	}
 
+	// index界面事件处理器
+	touchEventStartGame(e) {
+        e.preventDefault();
+
+        let x = e.touches[0].clientX;
+        let y = e.touches[0].clientY;
+
+        // 获取按钮矩阵
+        let _play = this.IndexUI.playRange;
+        let _share = this.IndexUI.shareRange;
+        let _rankList = this.IndexUI.rankListRange;
+        let _game = this.IndexUI.gameRange;
+
+        // 判断
+		this.__ClickRange({x:x,y:y},_play,()=>{
+			this.gameStart = true;// 开始游戏
+            this.touch()// 开启事件绑定
+		});
+		this.__ClickRange({x:x,y:y},_share,()=>{});
+		this.__ClickRange({x:x,y:y},_rankList,()=>{});
+		this.__ClickRange({x:x,y:y},_game,()=>{});
+	}
+
+	// 点击范围检测
+	__ClickRange(event,target,callback) {
+		if(event.x >= target.startX
+		&& event.x <= target.endX
+		&& event.y >= target.startY
+		&& event.y <= target.endY ){
+            callback();
+		}
+	}
+
   	//游戏结束后的触摸事件处理逻辑
 	touchEventHandler(e) {
 	     e.preventDefault();
@@ -135,7 +177,7 @@ export default class main{
 		}
 	}
 
-	// 砍树动作
+	// 砍树
 	touchCuttree(e){
 		e.preventDefault();//停止事件冒泡
 		let that = this;
@@ -143,7 +185,7 @@ export default class main{
 		if (databus.gameOver) {
 			return
 		}
-		that.npc.update(npcMove);// 砍树动作贴图
+		that.npc.update(npcMove);// 更新砍树动作贴图
 		// 100ms恢复贴图
 		setTimeout(()=>{
 			that.npc.update(npcImg)
@@ -155,6 +197,7 @@ export default class main{
 	// 点击事件监听
 	touch(){
 		let that = this;
+        canvas.removeEventListener('touchstart',this.touchCuttrees);
 		this.touchCuttrees = that.touchCuttree.bind(this); // 更改this指向
 		canvas.addEventListener('touchstart', this.touchCuttrees);
 	}
@@ -162,25 +205,39 @@ export default class main{
 	loop() { 
 		let that = this;
 		ctx.clearRect(0, 0, canvas.width, canvas.height);// 每帧清空
-		this.back.render();
+		this.back.render();// 渲染背景
 		this.npc.render();// 渲染主角
 
+		//  渲染位于渲染队列中的全部对象
 		for(let k in databus.trees){
-			databus.trees[k].renderTree(k)
+			databus.trees[k].renderTree(k);
 		}
-		this.npc.renderLifebar();// 绘制生命条
+
+		// 开始游戏控制
+		if(this.gameStart){
+            this.npc.renderLifebar();// 生命值
+		}
 		/*游戏结束*/
 		if (databus.gameOver||this.npc.blood<0.017) {	
 		  databus.gameOver = true;
 		  this.gameinfo.gameOver(databus.score);// 游戏结束 绘制结束UI
 		  // 重新绑定事件
 		  canvas.removeEventListener('touchstart',this.touchCuttrees);
-		  this.touchHandler = that.touchEventHandler.bind(this);//事件处理函数
-      	  canvas.addEventListener('touchstart', this.touchHandler);
+		  this.touchCuttrees = that.touchEventHandler.bind(this);//事件处理函数
+      	  canvas.addEventListener('touchstart', this.touchCuttrees);
 	      return
-	    }else{				  
-		  this.gameinfo.render(databus.score);// 修改分数
-		}			
+	    }else{
+			if(this.gameStart){
+                this.gameinfo.render(databus.score);// 修改分数
+			}
+		}
+
+        if(!this.gameStart){
+            this.IndexUI.render();// 渲染indexui
+            canvas.removeEventListener('touchstart',this.touchCuttrees);
+            this.touchCuttrees = that.touchEventStartGame.bind(this);//事件处理函数
+            canvas.addEventListener('touchstart', this.touchCuttrees);
+        }
 
 		// 每帧执行
 	 	window.requestAnimationFrame(

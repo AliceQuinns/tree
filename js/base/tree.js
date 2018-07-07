@@ -1,29 +1,30 @@
-let screenHeight = window.innerHeight
-let screenWidth  = window.innerWidth
+let screenHeight = window.innerHeight;
+let screenWidth  = window.innerWidth;
 
 export default class tree{
 	constructor(ctx,src='',l=true){
-		this.ctx = ctx
-		this.img = new Image()
-		this.img.src = src
-		this.posiDr = l  // 1代表左边，0代表右边
+		this.ctx = ctx;
+		this.img = new Image();
+		this.img.src = src;
+		this.posiDr = l  //
 	}
 
 	update(src,posiDr){
-		this.img.src = src
-		this.posiDr =posiDr
+		this.img.src = src;// url
+		this.posiDr =posiDr;// 方向
 	}
 
+	// 渲染树枝
 	renderTree(i){
-		let that = this
-		that.treePosition(i)
+		let that = this;
+		that.treePosition(i);
 		//that.img.onload = function(){	
 			that.ctx.drawImage(that.img,that.x,that.y,207,60)
 		//}
 	}
 
 	treePosition(i){
-		i++
+		i++;
 		if (this.posiDr && this.posiDr != "center") {
 			this.x = screenWidth/2-54
 		}else{
