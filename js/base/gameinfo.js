@@ -5,17 +5,17 @@ export default class gameinfo{
 	constructor(ctx){
 		this.ctx = ctx;
         // 创建一个渐变
-        let gradient=ctx.createLinearGradient(0,0,10000,0);
-        gradient.addColorStop('0',"magenta");
-        gradient.addColorStop('0.5',"blue");
-        gradient.addColorStop('1',"red");
-        this.gradient = gradient;
+        // let gradient=ctx.createLinearGradient(0,0,10000,0);
+        // gradient.addColorStop('0',"magenta");
+        // gradient.addColorStop('0.5',"blue");
+        // gradient.addColorStop('1',"red");
+        // this.gradient = gradient;
 	}
 
 	// 修改分数
 	render(score){	
-		this.ctx.font = "35px Microsoft YaHei";
-		this.ctx.fillStyle = this.gradient;
+		this.ctx.font = "30px Microsoft YaHei";
+		this.ctx.fillStyle = "#fff";
   		this.ctx.fillText("得分："+score,  screenWidth / 2 - 50,  100);
 	}
 
@@ -41,7 +41,7 @@ export default class gameinfo{
 
 		    this.ctx.fillStyle = "#883a3a";
 		    this.ctx.fillText(
-		      '重新开始',
+		      '返回主页',
 		      screenWidth / 2 - 50,
 		      screenHeight / 2 - 100 + 130
 		    );

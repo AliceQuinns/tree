@@ -16,6 +16,7 @@ export default class databus{
 		this.gameOver = false;
 		this.trees = [];
 		this.moveTree = [];
+        this.clearance = false;// 是否通关
 	}	
 
 	pushTree(tree){		

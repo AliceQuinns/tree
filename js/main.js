@@ -6,10 +6,13 @@ import Gameinfo from './base/gameinfo.js'
 import Audio from './base/audio.js'
 import Tool from './base/tool.js'
 import Index from './base/index.js'
+import Alert from './base/alert.js'
+
+let Level = 0;// 当前关卡
 
 let ctx = canvas.getContext('2d');
 let audioObj = new Audio();// 创建音频实例
-let databus = new Databus();
+let databus = new Databus();// 游戏状态
 let Tools = new Tool();// 创建工具类
 
 let screenHeight = window.innerHeight;
@@ -32,19 +35,32 @@ let bg = 'images/bg.png';
 export default class main{
 	constructor(){
         this.gameStart = false;// 游戏运行状态控制
+        this.helpStatus = false;// 帮助界面
+		Level = 0;// 关卡控制
+        this._gametimectr=null;// 游戏时间计时器对象
+		this.touchCuttrees=null;//事件回调队列
 		this.init();
 	}
 
 	init(){
+		this.Aggressivity = GLOBAL.Level[Level].Aggressivity;// 当前攻击力
+		this.hp = GLOBAL.Level[Level].hp;// 当前总血量
+		this.Gametime = GLOBAL.Level[Level].time*1000;// 当前游戏时间
+		window.clearInterval(this._gametimectr);//清空上一个计时器
+
 		databus.reset();// 重置状态
-		canvas.removeEventListener('touchstart',this.touchHandler);// 移除事件
+		canvas.removeEventListener('touchstart',this.touchCuttrees);// 移除事件
 		wx.triggerGC();// 调起js内存回收
 		/*降低帧率*/
 		//wx.setPreferredFramesPerSecond(20)
+
 		this.back = new Back(ctx,bg);// 实例化背景对象
-		this.npc = new Npc(ctx,npctexture);// 实例化主角
+		this.npc = new Npc(ctx,npctexture,Level);// 实例化主角
 		this.gameinfo = new Gameinfo(ctx);// 实例化分数与游戏结束控制
-		this.IndexUI = new Index(ctx);// 实例化indexUI
+		this.alert = new Alert(ctx);// 实例化弹框对象
+		if(!this.gameStart){
+            this.IndexUI = new Index(ctx);// 实例化indexUI
+		}
 
 		// 实例化木头
 		for (let i = 1; i < 15; i++) {
@@ -52,17 +68,40 @@ export default class main{
 			let _tree =  databus.pool.getItemByClass('tree',Tree,ctx,_img.img,_img.p);// 对象池请求
 			databus.pushTree(_tree);
 		}
-		// 再来一局情况
+
+		// 游戏开始绑定控制事件
 		if(this.gameStart){
-            this.touch();// 绑定点击事件
+            this.touch();// 游戏控制
 		}
+
+        // 播放背景音乐
+        audioObj.playMusic(Tools.getRandomInt(0,2)?"bg1":"bg2");
+
 		// update
 		window.requestAnimationFrame(
 	      this.loop.bind(this),
 	      canvas
 	    );
-		// 播放背景音乐
-        audioObj.playMusic(Tools.getRandomInt(0,2)?"bg1":"bg2");
+	}
+
+	// 控制游戏时间
+	ctrGameTime(time){
+		if(this._gametimectr){
+			window.clearInterval(this._gametimectr);//清除上一关计时器
+		}
+		let _ = window.setInterval(()=>{
+            this.npc.currentTime<=0?this.npc.currentTime=0:this.npc.currentTime-=10;
+			if(this.npc.currentTime<=0){
+				window.clearInterval(_);//清空定时器
+				if(!databus.gameOver||this.npc.blood>0.017){
+                    Level+=1;//进入下一关
+                    databus.gameOver = true;// 暂停游戏
+                    databus.clearance = true;// 通关成功
+					// 渲染通关弹窗
+				}
+			}
+		},10);
+        this._gametimectr = _;
 	}
 
 	run(){			
@@ -77,10 +116,10 @@ export default class main{
 		if (!(this.npc.posi == tap)) {
 			this.npc.posi = !this.npc.posi;
 			return
-		}		
+		}
 
 		databus.score++;
-		this.npc.blood = (this.npc.blood + 160>=6000)?6000:this.npc.blood+160;// 添加生命值
+		this.npc.blood = (this.npc.blood + this.Aggressivity>=this.hp)?this.hp:this.npc.blood+this.Aggressivity;// 减慢敌人速度
 		// 回收木头
 		databus.shiftTree();
         // 产生新木头
@@ -142,8 +181,8 @@ export default class main{
 
         // 判断
 		this.__ClickRange({x:x,y:y},_play,()=>{
-			this.gameStart = true;// 开始游戏
-            this.touch()// 开启事件绑定
+            this.gameStart = true;// 开始游戏 并关闭index弹窗
+            this.helpStatus = true;// 开启游戏帮助界面
 		});
 		this.__ClickRange({x:x,y:y},_share,()=>{});
 		this.__ClickRange({x:x,y:y},_rankList,()=>{});
@@ -160,7 +199,7 @@ export default class main{
 		}
 	}
 
-  	//游戏结束后的触摸事件处理逻辑
+  	//游戏结束后的触摸事件处理逻辑  再来一局按钮
 	touchEventHandler(e) {
 	     e.preventDefault();
 
@@ -173,8 +212,29 @@ export default class main{
         && y >= area.startY
         && y <= area.endY ){
 		   	ctx.clearRect(0, 0, canvas.width, canvas.height);// 清空canvas
+			Level = 0;//还原到第一关
+			this.gameStart = false;
 		    this.init();// 重新开始
 		}
+	}
+
+	// 进入下一关按钮回调
+    clearanceHandler(e){
+        e.preventDefault();
+
+        let x = e.touches[0].clientX;
+        let y = e.touches[0].clientY;
+
+        let area = this.alert.btnMatrix;// 获得按钮范围
+        if (x >= area.startX
+            && x <= area.endX
+            && y >= area.startY
+            && y <= area.endY ){
+            ctx.clearRect(0, 0, canvas.width, canvas.height);// 清空canvas
+            this.gameStart = true;
+            this.init();// 重新开始
+            this.ctrGameTime(this.Gametime);// 开启游戏时间控制
+        }
 	}
 
 	// 砍树
@@ -191,6 +251,7 @@ export default class main{
 			that.npc.update(npcImg)
 		},100);
 		that.touchX = e.touches[0].clientX;// 获取点击位置的X坐标
+        this.npc.WormType = !this.npc.WormType;//切换虫子贴图
 		that.run();
 	}
 
@@ -213,12 +274,24 @@ export default class main{
 			databus.trees[k].renderTree(k);
 		}
 
+		// 渲染关卡文本
+        ctx.font = "30px Microsoft YaHei";
+        ctx.fillStyle = "#fff";
+        ctx.fillText("第"+(Level+1)+"关",  10,  40);
+
 		// 开始游戏控制
-		if(this.gameStart){
+		if(this.gameStart&&!databus.clearance&&!this.helpStatus){
             this.npc.renderLifebar();// 生命值
 		}
-		/*游戏结束*/
-		if (databus.gameOver||this.npc.blood<0.017) {	
+		/*游戏结束 如果游戏结束时通关了则渲染通关弹窗*/
+		if(databus.clearance){
+            this.alert.render("clearance");// 绘制通关界面
+            // 重新绑定事件
+            canvas.removeEventListener('touchstart',this.touchCuttrees);
+            this.touchCuttrees = that.clearanceHandler.bind(this);//事件处理函数
+            canvas.addEventListener('touchstart', this.touchCuttrees);
+            return
+		}else if (!databus.clearance&&(databus.gameOver||this.npc.blood<0.017)) {
 		  databus.gameOver = true;
 		  this.gameinfo.gameOver(databus.score);// 游戏结束 绘制结束UI
 		  // 重新绑定事件
@@ -236,6 +309,18 @@ export default class main{
             this.IndexUI.render();// 渲染indexui
             canvas.removeEventListener('touchstart',this.touchCuttrees);
             this.touchCuttrees = that.touchEventStartGame.bind(this);//事件处理函数
+            canvas.addEventListener('touchstart', this.touchCuttrees);
+        }
+
+        if(this.helpStatus){
+            this.alert.render("help");// 绘制游戏帮助界面
+            // 重新绑定事件
+            canvas.removeEventListener('touchstart',this.touchCuttrees);
+            this.touchCuttrees = ()=>{
+                this.helpStatus = false;// 关闭游戏帮助界面
+                this.touch();// 开启事件绑定
+                this.ctrGameTime(this.Gametime);// 开启游戏时间控制
+            };//事件处理函数
             canvas.addEventListener('touchstart', this.touchCuttrees);
         }
 
