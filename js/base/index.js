@@ -39,18 +39,21 @@ export default class index{
             endX  : (screenWidth/2-_URL.playsize.width/2) + _URL.playsize.width,
             endY  : screenHeight/1.5 + _URL.playsize.height
         };
+        // 排行榜
         this.rankListRange = {
             startX: _URL.btnsize.width/2,
             startY: screenHeight/1.25,
             endX  : _URL.btnsize.width/2  + _URL.btnsize.width,
             endY  : screenHeight/1.25 + _URL.btnsize.height
         };
+        // 分享
         this.shareRange = {
             startX: screenWidth/2-_URL.btnsize.width/2,
             startY: screenHeight/1.25,
             endX  : screenWidth/2-_URL.btnsize.width/2 + _URL.btnsize.width,
             endY  : screenHeight/1.25 + _URL.btnsize.height
         };
+        // 更多游戏
         this.gameRange = {
             startX: screenWidth-_URL.btnsize.width*1.5,
             startY: screenHeight/1.25,

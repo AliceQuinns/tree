@@ -32,6 +32,11 @@ export default class npc{
 
 	// 更新主角
 	render(){
+		// 阴影
+        this.ctx.shadowColor = "#121500";
+        this.ctx.shadowOffsetX = 3;
+        this.ctx.shadowOffsetY = 3;
+        this.ctx.shadowBlur= 3;
 		let that = this;
 		that.treePosition();// 计算主角坐标
 		if (that.posi) {
@@ -47,7 +52,10 @@ export default class npc{
 		    that.ctx.translate(300, 0);
 		    that.ctx.scale(-1, 1);
 		}
-			
+		// 还原样式
+        this.ctx.shadowOffsetX = 0;
+        this.ctx.shadowOffsetY = 0;
+        this.ctx.shadowBlur= 0;
 	}
 	treePosition(){
 		if (this.posi) {
@@ -67,8 +75,18 @@ export default class npc{
 		this.ctx.fillStyle = "#222";
 		this.ctx.fillRect(screenWidth/2-95,30,190,30);
 		this.ctx.fillStyle = "red";
+
 		this.ctx.fillRect(screenWidth/2-90,35,180*(this.currentTime/this.time),20);
+        // 阴影
+        this.ctx.shadowColor = "#101500";
+        this.ctx.shadowOffsetX = 8;
+        this.ctx.shadowOffsetY = 8;
+        this.ctx.shadowBlur= 5;
 		// 绘制敌人
 		this.ctx.drawImage(this.WormType?this.Worm1:this.Worm2,screenWidth/2-50,(screenHeight-120)*(this.blood/this.hp_max),100,90);
+		// 关闭阴影
+        this.ctx.shadowOffsetX = 0;
+        this.ctx.shadowOffsetY = 0;
+        this.ctx.shadowBlur= 0;
 	}
 }

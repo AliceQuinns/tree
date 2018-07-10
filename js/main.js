@@ -39,6 +39,7 @@ export default class main{
 		Level = 0;// 关卡控制
         this._gametimectr=null;// 游戏时间计时器对象
 		this.touchCuttrees=null;//事件回调队列
+		WxModular.share();// 开启分享功能
 		this.init();
 	}
 
@@ -164,6 +165,10 @@ export default class main{
 	collisionDetection(){
 		let isCollision = (this.npc.posi==databus.trees[0].posiDr);
 		isCollision&&(databus.gameOver = true)&&(this.npc.update(npcDie));
+		if(databus.gameOver){
+            Tools.getshock(2);// 震动
+			WxModular.Ranking(2,databus.score);
+		}
 	}
 
 	// index界面事件处理器
@@ -184,9 +189,18 @@ export default class main{
             this.gameStart = true;// 开始游戏 并关闭index弹窗
             this.helpStatus = true;// 开启游戏帮助界面
 		});
-		this.__ClickRange({x:x,y:y},_share,()=>{});
-		this.__ClickRange({x:x,y:y},_rankList,()=>{});
-		this.__ClickRange({x:x,y:y},_game,()=>{});
+		// 分享
+		this.__ClickRange({x:x,y:y},_share,()=>{
+            window.shareBTN();
+		});
+		// 排行榜
+		this.__ClickRange({x:x,y:y},_rankList,()=>{
+
+		});
+		// 更多游戏
+		this.__ClickRange({x:x,y:y},_game,()=>{
+            WxModular.MoreGames();
+		});
 	}
 
 	// 点击范围检测
@@ -246,6 +260,7 @@ export default class main{
 			return
 		}
 		that.npc.update(npcMove);// 更新砍树动作贴图
+		Tools.getshock(1);//震动
 		// 100ms恢复贴图
 		setTimeout(()=>{
 			that.npc.update(npcImg)
@@ -274,18 +289,17 @@ export default class main{
 			databus.trees[k].renderTree(k);
 		}
 
-		// 渲染关卡文本
-        ctx.font = "30px Microsoft YaHei";
-        ctx.fillStyle = "#fff";
-        ctx.fillText("第"+(Level+1)+"关",  10,  40);
-
 		// 开始游戏控制
 		if(this.gameStart&&!databus.clearance&&!this.helpStatus){
             this.npc.renderLifebar();// 生命值
+            // 渲染关卡文本
+            ctx.font = "20px Microsoft YaHei";
+            ctx.fillStyle = "#fff";
+            ctx.fillText("第"+(Level+1)+"关",  10,  50);
 		}
 		/*游戏结束 如果游戏结束时通关了则渲染通关弹窗*/
 		if(databus.clearance){
-            this.alert.render("clearance");// 绘制通关界面
+            this.alert.render("clearance",Level,databus.score);// 绘制通关界面
             // 重新绑定事件
             canvas.removeEventListener('touchstart',this.touchCuttrees);
             this.touchCuttrees = that.clearanceHandler.bind(this);//事件处理函数
