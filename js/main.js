@@ -40,6 +40,8 @@ export default class main{
         this._gametimectr=null;// 游戏时间计时器对象
 		this.touchCuttrees=null;//事件回调队列
 		WxModular.share();// 开启分享功能
+        sharedCanvas.width = screenWidth;
+        sharedCanvas.height = screenHeight;
 		this.init();
 	}
 
@@ -167,7 +169,7 @@ export default class main{
 		isCollision&&(databus.gameOver = true)&&(this.npc.update(npcDie));
 		if(databus.gameOver){
             Tools.getshock(2);// 震动
-			WxModular.Ranking(2,databus.score);
+			WxModular.Ranking(1,databus.score);// 开启得分面板
 		}
 	}
 
@@ -278,7 +280,8 @@ export default class main{
 		canvas.addEventListener('touchstart', this.touchCuttrees);
 	}
 
-	loop() { 
+	loop() {
+        // 排行榜
 		let that = this;
 		ctx.clearRect(0, 0, canvas.width, canvas.height);// 每帧清空
 		this.back.render();// 渲染背景
@@ -337,6 +340,8 @@ export default class main{
             };//事件处理函数
             canvas.addEventListener('touchstart', this.touchCuttrees);
         }
+
+        ctx.drawImage(sharedCanvas,0,0);
 
 		// 每帧执行
 	 	window.requestAnimationFrame(

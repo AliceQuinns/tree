@@ -15,10 +15,10 @@ export default class gameinfo{
 
 	// 游戏结束
 	gameOver(score){
-		this.ctx.fillStyle = "#883a3a";
-		this.ctx.fillRect(screenWidth / 2 - 150,screenHeight / 2 - 100,300,160);
-		this.ctx.font = "24px Microsoft YaHei";
-		this.ctx.fillStyle = "#fefefe";
+        this.ctx.fillStyle = "#883a3a";
+        this.ctx.fillRect(screenWidth / 2 - 150,screenHeight / 2 - 100,300,160);
+        this.ctx.font = "24px Microsoft YaHei";
+        this.ctx.fillStyle = "#fefefe";
         this.ctx.fillText(
             '游戏结束',
             screenWidth / 2 - 50,
@@ -39,6 +39,9 @@ export default class gameinfo{
             screenHeight / 2 - 100 + 130
         );
 
+        // 排行榜
+        this.ctx.drawImage(sharedCanvas,0,0);
+
         // 重新游戏
         this.btnArea = {
             startX: screenWidth / 2 - 150,
@@ -46,8 +49,5 @@ export default class gameinfo{
             endX  : screenWidth / 2  + 150,
             endY  : screenHeight / 2 - 100 + 160
         };
-
-		// 排行榜
-        this.ctx.drawImage(sharedCanvas, 0, 0);
 	}
 }

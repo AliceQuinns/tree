@@ -82,6 +82,6 @@ window.WxModular = {
     },
     // 排行榜
     Ranking: (types, data)=>{
-        wx.postMessage({ type: types, data: data });
+        wx.postMessage({ type: types, score: data });
     }
 };
