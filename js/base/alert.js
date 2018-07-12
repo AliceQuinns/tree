@@ -63,14 +63,6 @@ export default class alert{
                 this.clearanceUI.share.size.w,
                 this.clearanceUI.share.size.h
             );
-            // 表情包
-            // this.ctx.drawImage(
-            //     this.clearanceUI.img.obj,
-            //     screenWidth/2-this.clearanceUI.img.size.w/2,
-            //     screenHeight/2-this.clearanceUI.img.size.h/2,
-            //     this.clearanceUI.img.size.w,
-            //     this.clearanceUI.img.size.h
-            // );
             // 绘制文字
             this.ctx.font = "28px Microsoft YaHei";
             this.ctx.fillStyle = "#fefefe";

@@ -76,7 +76,7 @@ export default class npc{
 		this.ctx.fillRect(screenWidth/2-95,30,190,30);
 		this.ctx.fillStyle = "red";
 
-		this.ctx.fillRect(screenWidth/2-90,35,180*(this.currentTime/this.time),20);
+		this.ctx.fillRect(screenWidth/2-90,35,180*(this.blood/this.hp_max),20);
         // 阴影
         this.ctx.shadowColor = "#101500";
         this.ctx.shadowOffsetX = 8;

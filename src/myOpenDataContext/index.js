@@ -34,9 +34,9 @@ let OBJsize = {
 (new (class Ranking{
     constructor(){
         this.status = 0;// 渲染控制
-        this.userdatas = null;// 数据
-        this.score = 0;//分数
-        this.MAXscore = 0;//最高分
+        this.userdatas = null;// 好友数据
+        this.score = 0;// 当前分数
+        this.MAXscore = 0;// 最高分
         this.sharedCanvas = wx.getSharedCanvas();
         this._canvas = this.sharedCanvas.getContext('2d');
         this.init();
@@ -50,7 +50,6 @@ let OBJsize = {
             item: this.createIMG("tips/header_bg.png")
         };
         this.Message();//初始化事件监听
-        this.render();//渲染
     }
     // 创建图片节点
     createIMG(src){
@@ -58,67 +57,80 @@ let OBJsize = {
         target.src = src;
         return target;
     }
+
+    // 获取好友信息
+    GETfriden = ()=>{
+        let self = this;
+        wx.getFriendCloudStorage({
+            keyList:['score'],
+            success: data => {
+                console.log("获取到好友数据为",data);
+                self.userdatas = data.data;// 保存好友数据
+                // 渲染
+                self.render();
+            },
+            fail: err => {
+                console.error("获取好友列表失败",err);
+            }
+        })
+    };
+
     // 消息
     Message(){
         let _ = this;
         wx.onMessage(res => {
             // 检查输入
-            if(!res||!res.type||!res.score){console.log("请传入正确的参数");return;}
-            // 获取好友面板
-            let GETfriden = (status,callback)=>{
-                wx.getFriendCloudStorage({
-                    keyList:['score'],
-                    success: data => {
-                        console.log("获取到好友数据为",data);
-                        if(callback)callback();
-                        _.status = 1;
-                        _.userdatas = data.data;
-                    },
-                    fail: err => {
-                        console.error("获取好友列表失败",err);
-                    }
-                })
-            };
+            if(!res||!res.type){console.log("请传入正确的参数");return;}
+            console.log("监听到传入数据为    ",res);
             // 得分面板
             if(res.type === 1){
-                console.log("当前开启面板为 [得分面板] 接受到传入数据为",res);
-                _.score = res.score;
-                // 修改分数
+                _.status = 1;// 切换渲染模式
+                _.score = res.score;// 更新分数
+                // 获取用户字段
                 wx.getUserCloudStorage({
                     keyList: ['score'],
                     success: data => {
-                        if(Number(data.KVDataList[0].value)<=Number(res.score)){
-                            _.MAXscore = res.score;
+                        // 如果当前用户是新用户或当前分数大于历史分数 则修改分数
+                        if(data.KVDataList.length<=0||(Number(data.KVDataList[0].value)<=Number(res.score))){
+                            _.MAXscore = res.score;// 当前分数为最高分数
                             wx.setUserCloudStorage({
                                 KVDataList: [{ key: 'score', value: String(res.score) }],
                                 success: data => {
-                                    console.log("已更新最高分为",res.score);
-                                    GETfriden("set");
+                                    this.GETfriden();// 获取好友列表
+                                },
+                                fail: (err)=>{
+                                    console.log(err,"修改分数失败");
                                 }
                             })
                         }else{
+                            // 非新用户 且当前分数未超过历史分数 用当前分数
                             _.MAXscore = data.KVDataList[0].value;
-                            GETfriden("get");
+                            this.GETfriden();
                         }
                     },
                     fail: err => {
-                        console.log(err,"获取不到用户托管数据 请验证appid权限");
-                        GETfriden("err");
+                        // 无法获取到用户分数则跳过分数判断
+                        this.GETfriden();
                     }
                 });
             }else if(res.type === 2){
                 // 完整排行榜
-                GETfriden('complete');
+                this.GETfriden();
             }else if(res.type === 3){
                 // 群排行榜
+            }else if(res.type === 4){
+                // 关闭显示
+                _.status = 4;
             }
         });
     }
+
     // 渲染函数
     render(){
         let self = this;
-        let _size = OBJsize;
+        let _size = OBJsize;// 对象尺寸
         let _ = ()=>{
+            console.log("渲染离屏canvas  一次");
             this._canvas.clearRect(0, 0, screenWidth, screenHeight);
             if(self.status === 1){
                 // 背景
@@ -149,26 +161,31 @@ let OBJsize = {
             }else if(self.status === 3){
 
             }
-            requestAnimationFrame(_.bind(this));
+            //requestAnimationFrame(_.bind(this));
         };
-        requestAnimationFrame(_.bind(this));
+        //requestAnimationFrame(_.bind(this));
+        _();
     }
+
     // 玩家渲染
     itemRender(type,size){
         let self = this;
         // 得分渲染
         if(type===1){
             for(let i=0;i<size;i++){
+                if(!self.userdatas)return;
                 if(self.userdatas[i]){
-                    // 头像
-                    this._canvas.drawImage(
-                        this.createIMG(
-                          this.userdatas[i].avatarUrl,
-                        ),
-                        OBJsize.bg1.x+((i+1)*OBJsize.item1.w/4)+i*OBJsize.item1.w,
-                        screenHeight/2-OBJsize.item1.h/2+15,
-                        OBJsize.item1.w,
-                        OBJsize.item1.h);
+                    let img = wx.createImage();
+                    img.src =  this.userdatas[i].avatarUrl;
+                    img.onload = ()=>{
+                        // 头像
+                        self._canvas.drawImage(
+                            img,
+                            OBJsize.bg1.x+((i+1)*OBJsize.item1.w/4)+i*OBJsize.item1.w,
+                            screenHeight/2-OBJsize.item1.h/2+15,
+                            OBJsize.item1.w,
+                            OBJsize.item1.h);
+                    };
                     // 名称
                     let text = this.userdatas[i].nickname;
                     if(text.length>=6)text = text.slice(0,5);
@@ -191,7 +208,6 @@ let OBJsize = {
             }
         }else{
             // 完整渲染
-
         }
     }
 }));

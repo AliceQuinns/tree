@@ -3,16 +3,13 @@
   <component name="ChangeListManager">
     <list default="true" id="7cbfd87e-c4f9-46a1-8cac-7f7334177eeb" name="Default" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/images/Expression/1.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/images/gameover/header_bg.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/images/gameover/rank.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/images/gameover/score.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/js/WxGlobal.js" beforeDir="false" afterPath="$PROJECT_DIR$/js/WxGlobal.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/images/gameover/bg.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/js/base/alert.js" beforeDir="false" afterPath="$PROJECT_DIR$/js/base/alert.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/js/base/gameinfo.js" beforeDir="false" afterPath="$PROJECT_DIR$/js/base/gameinfo.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/js/base/npc.js" beforeDir="false" afterPath="$PROJECT_DIR$/js/base/npc.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/js/main.js" beforeDir="false" afterPath="$PROJECT_DIR$/js/main.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/project.config.json" beforeDir="false" afterPath="$PROJECT_DIR$/project.config.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/myOpenDataContext/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/myOpenDataContext/index.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tips/bg.png" beforeDir="false" afterPath="$PROJECT_DIR$/tips/bg.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tips/Automaton.ttf" beforeDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/.tmp/" />
     <ignored path="$PROJECT_DIR$/temp/" />
@@ -29,8 +26,8 @@
       <file leaf-file-name="main.js" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/js/main.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-208">
-              <caret line="317" column="16" lean-forward="true" selection-start-line="317" selection-start-column="16" selection-end-line="317" selection-end-column="16" />
+            <state relative-caret-position="498">
+              <caret line="345" column="48" lean-forward="true" selection-start-line="345" selection-start-column="48" selection-end-line="345" selection-end-column="48" />
               <folding>
                 <element signature="e#0#39#0" expanded="true" />
               </folding>
@@ -38,20 +35,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="gameinfo.js" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/js/base/gameinfo.js">
+      <file leaf-file-name="WxGlobal.js" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/js/WxGlobal.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="522">
-              <caret line="45" column="24" lean-forward="true" selection-start-line="45" selection-start-column="24" selection-end-line="45" selection-end-column="24" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="index.js" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/myOpenDataContext/index.js">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="2001">
-              <caret line="111" column="37" lean-forward="true" selection-start-line="111" selection-start-column="37" selection-end-line="111" selection-end-column="37" />
+            <state relative-caret-position="198">
+              <caret line="61" column="24" lean-forward="true" selection-start-line="61" selection-start-column="24" selection-end-line="61" selection-end-column="24" />
             </state>
           </provider>
         </entry>
@@ -67,21 +55,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>btnArea</find>
-      <find>randomTree</find>
-      <find>restart</find>
-      <find>npcDie</find>
-      <find>run</find>
-      <find>collisionDetection</find>
-      <find>Index</find>
-      <find>IndexUI</find>
-      <find>screenWidth/2-_URL.playsize.width/2</find>
-      <find>screenHeight/1.2</find>
-      <find>screenWidth/2-_URL.btnsize.width/2</find>
-      <find>_URL.btnsize.width/2</find>
-      <find>touch</find>
-      <find>gameStart</find>
-      <find>touchEventStartGame</find>
       <find>touchEventHandler</find>
       <find>init</find>
       <find>Level</find>
@@ -94,9 +67,24 @@
       <find>clearanceHandler</find>
       <find>1.3</find>
       <find>loop</find>
-      <find>sharedCanvas</find>
-      <find>userdatas</find>
       <find>item1</find>
+      <find>sharedCanvas</find>
+      <find>Ranking\</find>
+      <find>Ranking</find>
+      <find>wx</find>
+      <find>getUserCloudStorage</find>
+      <find>fail</find>
+      <find>GETfriden</find>
+      <find>MAXscore</find>
+      <find>userdatas</find>
+      <find>_</find>
+      <find>render</find>
+      <find>ctx.drawImage(sharedCanvas,0,0);</find>
+      <find>RankingUI</find>
+      <find>_Ranking</find>
+      <find>WxModular.Ranking(4)</find>
+      <find>cancelAnimationFrame</find>
+      <find>ctx2_Render_id</find>
     </findStrings>
     <replaceStrings>
       <replace>1.5</replace>
@@ -114,16 +102,16 @@
         <option value="$PROJECT_DIR$/js/base/tree.js" />
         <option value="$PROJECT_DIR$/js/base/bg.js" />
         <option value="$PROJECT_DIR$/js/base/databus.js" />
-        <option value="$PROJECT_DIR$/js/base/npc.js" />
         <option value="$PROJECT_DIR$/js/base/Global.js" />
         <option value="$PROJECT_DIR$/js/base/tool.js" />
         <option value="$PROJECT_DIR$/game.js" />
         <option value="$PROJECT_DIR$/js/base/index.js" />
         <option value="$PROJECT_DIR$/game.json" />
-        <option value="$PROJECT_DIR$/js/base/alert.js" />
         <option value="$PROJECT_DIR$/js/WxGlobal.js" />
+        <option value="$PROJECT_DIR$/js/base/alert.js" />
         <option value="$PROJECT_DIR$/js/base/gameinfo.js" />
         <option value="$PROJECT_DIR$/src/myOpenDataContext/index.js" />
+        <option value="$PROJECT_DIR$/js/base/npc.js" />
         <option value="$PROJECT_DIR$/js/main.js" />
       </list>
     </option>
@@ -162,6 +150,17 @@
             <path>
               <item name="crazyTree" type="b2602c69:ProjectViewProjectNode" />
               <item name="crazyTree" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="crazyTree" type="b2602c69:ProjectViewProjectNode" />
+              <item name="crazyTree" type="462c0819:PsiDirectoryNode" />
+              <item name="images" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="crazyTree" type="b2602c69:ProjectViewProjectNode" />
+              <item name="crazyTree" type="462c0819:PsiDirectoryNode" />
+              <item name="images" type="462c0819:PsiDirectoryNode" />
+              <item name="gameover" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="crazyTree" type="b2602c69:ProjectViewProjectNode" />
@@ -238,11 +237,12 @@
       <workItem from="1531099990316" duration="30672000" />
       <workItem from="1531189159296" duration="27914000" />
       <workItem from="1531278039493" duration="29775000" />
+      <workItem from="1531364129259" duration="23004000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="155596000" />
+    <option name="totallyTimeSpent" value="178600000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1936" height="1096" extended-state="6" />
@@ -274,10 +274,37 @@
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
-      <option name="time" value="6" />
+      <option name="time" value="7" />
     </breakpoint-manager>
   </component>
   <component name="editorHistoryManager">
+    <entry file="file://$PROJECT_DIR$/js/main.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="9193">
+          <caret line="317" column="16" lean-forward="true" selection-start-line="317" selection-start-column="16" selection-end-line="317" selection-end-column="16" />
+          <folding>
+            <element signature="e#0#39#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/js/base/gameinfo.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1305">
+          <caret line="45" column="24" lean-forward="true" selection-start-line="45" selection-start-column="24" selection-end-line="45" selection-end-column="24" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/myOpenDataContext/index.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="3219">
+          <caret line="111" column="37" lean-forward="true" selection-start-line="111" selection-start-column="37" selection-end-line="111" selection-end-column="37" />
+          <folding>
+            <element signature="e#124#814#0" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/js/libs/symbol.js">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="203">
@@ -292,24 +319,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/js/base/pool.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="546">
-          <caret line="33" column="13" selection-start-line="33" selection-start-column="13" selection-end-line="33" selection-end-column="13" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/js/base/tree.js">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="472">
           <caret line="28" column="37" lean-forward="true" selection-start-line="28" selection-start-column="37" selection-end-line="28" selection-end-column="37" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/js/base/npc.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="488">
-          <caret line="83" column="31" lean-forward="true" selection-start-line="83" selection-start-column="31" selection-end-line="83" selection-end-column="31" />
         </state>
       </provider>
     </entry>
@@ -334,76 +347,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/js/base/index.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="522">
-          <caret line="18" column="46" lean-forward="true" selection-start-line="18" selection-start-column="46" selection-end-line="18" selection-end-column="46" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/tips/num_1.png">
-      <provider selected="true" editor-type-id="images" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/tips/num_6.png">
-      <provider selected="true" editor-type-id="images" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/tips/num_9.png">
-      <provider selected="true" editor-type-id="images" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/tips/top_Bg.png">
-      <provider selected="true" editor-type-id="images" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/tips/this_score.png">
-      <provider selected="true" editor-type-id="images" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/tips/bg.png">
-      <provider selected="true" editor-type-id="images" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/tips/coloured_ribbon.png">
-      <provider selected="true" editor-type-id="images" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/tips/gold_3.png">
-      <provider selected="true" editor-type-id="images" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/tips/gold_1.png">
-      <provider selected="true" editor-type-id="images" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/images/bg.png">
-      <provider selected="true" editor-type-id="images" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/images/coloured_ribbon.png">
-      <provider selected="true" editor-type-id="images" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/images/gold_1.png">
-      <provider selected="true" editor-type-id="images" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/images/top_Bg.png">
-      <provider selected="true" editor-type-id="images" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/images/this_score.png">
-      <provider selected="true" editor-type-id="images" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/images/sx_btn.png">
-      <provider selected="true" editor-type-id="images" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/images/rank.png">
-      <provider selected="true" editor-type-id="images" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/images/num_9.png">
-      <provider selected="true" editor-type-id="images" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/images/num_8.png">
-      <provider selected="true" editor-type-id="images" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/images/num_6.png">
-      <provider selected="true" editor-type-id="images" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/images/header_bg.png">
-      <provider selected="true" editor-type-id="images" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/images/gold_3.png">
-      <provider selected="true" editor-type-id="images" />
-    </entry>
     <entry file="file://$PROJECT_DIR$/js/base/audio.js">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="638">
@@ -418,45 +361,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/texture/top_Bg.png">
-      <provider selected="true" editor-type-id="images" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/texture/num_5.png">
-      <provider selected="true" editor-type-id="images" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/texture/gold_3.png">
-      <provider selected="true" editor-type-id="images" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/texture/score.png">
-      <provider selected="true" editor-type-id="images" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/texture/this_score.png">
-      <provider selected="true" editor-type-id="images" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/texture/gold_1.png">
-      <provider selected="true" editor-type-id="images" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/texture/gold_2.png">
-      <provider selected="true" editor-type-id="images" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/texture/num_0.png">
-      <provider selected="true" editor-type-id="images" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/texture/rank.png">
-      <provider selected="true" editor-type-id="images" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/texture/num_2.png">
-      <provider selected="true" editor-type-id="images" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/texture/coloured_ribbon.png">
-      <provider selected="true" editor-type-id="images" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/texture/bg.png">
-      <provider selected="true" editor-type-id="images" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/tips/rank.png">
-      <provider selected="true" editor-type-id="images" />
-    </entry>
     <entry file="file://$PROJECT_DIR$/game.js">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="145">
@@ -467,38 +371,92 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/js/base/alert.js">
+    <entry file="file://$PROJECT_DIR$/js/base/pool.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="986">
-          <caret line="91" column="34" lean-forward="true" selection-start-line="91" selection-start-column="34" selection-end-line="91" selection-end-column="34" />
+        <state relative-caret-position="576">
+          <caret line="33" column="13" selection-start-line="33" selection-start-column="13" selection-end-line="33" selection-end-column="13" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/js/WxGlobal.js">
+    <entry file="file://$PROJECT_DIR$/tips/header_bg.png">
+      <provider selected="true" editor-type-id="images" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/tips/gold_2.png">
+      <provider selected="true" editor-type-id="images" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/tips/gold_1.png">
+      <provider selected="true" editor-type-id="images" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/tips/bg1.png">
+      <provider selected="true" editor-type-id="images" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/tips/coloured_ribbon.png">
+      <provider selected="true" editor-type-id="images" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/tips/bg.png">
+      <provider selected="true" editor-type-id="images" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/js/base/index.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="662">
-          <caret line="84" column="53" lean-forward="true" selection-start-line="84" selection-start-column="53" selection-end-line="84" selection-end-column="53" />
+        <state relative-caret-position="87">
+          <caret line="3" selection-start-line="3" selection-end-line="12" selection-end-column="2" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/images/gameover/chain.png">
+      <provider selected="true" editor-type-id="images" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/images/gameover/play_again.png">
+      <provider selected="true" editor-type-id="images" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/images/gameover/share.png">
+      <provider selected="true" editor-type-id="images" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/images/gameover/return.png">
+      <provider selected="true" editor-type-id="images" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/js/base/alert.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1475">
+          <caret line="86" column="57" lean-forward="true" selection-start-line="86" selection-start-column="57" selection-end-line="86" selection-end-column="57" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/js/base/gameinfo.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="522">
-          <caret line="45" column="24" lean-forward="true" selection-start-line="45" selection-start-column="24" selection-end-line="45" selection-end-column="24" />
+        <state relative-caret-position="517">
+          <caret line="34" column="22" lean-forward="true" selection-start-line="34" selection-start-column="22" selection-end-line="34" selection-end-column="22" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/myOpenDataContext/index.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2001">
-          <caret line="111" column="37" lean-forward="true" selection-start-line="111" selection-start-column="37" selection-end-line="111" selection-end-column="37" />
+        <state relative-caret-position="604">
+          <caret line="160" column="40" lean-forward="true" selection-start-line="160" selection-start-column="40" selection-end-line="160" selection-end-column="40" />
+          <folding>
+            <element signature="e#124#814#0" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/js/base/npc.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="401">
+          <caret line="80" column="41" lean-forward="true" selection-start-line="80" selection-start-column="41" selection-end-line="80" selection-end-column="41" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/js/WxGlobal.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="198">
+          <caret line="61" column="24" lean-forward="true" selection-start-line="61" selection-start-column="24" selection-end-line="61" selection-end-column="24" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/js/main.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-208">
-          <caret line="317" column="16" lean-forward="true" selection-start-line="317" selection-start-column="16" selection-end-line="317" selection-end-column="16" />
+        <state relative-caret-position="498">
+          <caret line="345" column="48" lean-forward="true" selection-start-line="345" selection-start-column="48" selection-end-line="345" selection-end-column="48" />
           <folding>
             <element signature="e#0#39#0" expanded="true" />
           </folding>

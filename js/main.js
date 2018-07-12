@@ -34,6 +34,9 @@ let bg = 'images/bg.png';
 
 export default class main{
 	constructor(){
+		// 控制帧循环
+		this._loop = null;
+		// this._Ranking = null;
         this.gameStart = false;// 游戏运行状态控制
         this.helpStatus = false;// 帮助界面
 		Level = 0;// 关卡控制
@@ -46,16 +49,18 @@ export default class main{
 	}
 
 	init(){
-		this.Aggressivity = GLOBAL.Level[Level].Aggressivity;// 当前攻击力
-		this.hp = GLOBAL.Level[Level].hp;// 当前总血量
-		this.Gametime = GLOBAL.Level[Level].time*1000;// 当前游戏时间
-		window.clearInterval(this._gametimectr);//清空上一个计时器
-
+        // 清空上一个计时器和帧循环
+		window.clearInterval(this._gametimectr);
+        cancelAnimationFrame(this._loop);
+        // cancelAnimationFrame(this._Ranking);
 		databus.reset();// 重置状态
 		canvas.removeEventListener('touchstart',this.touchCuttrees);// 移除事件
 		wx.triggerGC();// 调起js内存回收
-		/*降低帧率*/
-		//wx.setPreferredFramesPerSecond(20)
+       //WxModular.Ranking(4);// 关闭排行榜
+
+        this.Aggressivity = GLOBAL.Level[Level].Aggressivity;// 当前攻击力
+        this.hp = GLOBAL.Level[Level].hp;// 当前总血量
+        this.Gametime = GLOBAL.Level[Level].time*1000;// 当前游戏时间
 
 		this.back = new Back(ctx,bg);// 实例化背景对象
 		this.npc = new Npc(ctx,npctexture,Level);// 实例化主角
@@ -81,14 +86,20 @@ export default class main{
         audioObj.playMusic(Tools.getRandomInt(0,2)?"bg1":"bg2");
 
 		// update
-		window.requestAnimationFrame(
+		this._loop =  window.requestAnimationFrame(
 	      this.loop.bind(this),
 	      canvas
 	    );
+
+		// 排行榜渲染
+        // this._Ranking =  window.requestAnimationFrame(
+         //    this.RankingUI.bind(this),
+         //    canvas
+        // );
 	}
 
 	// 控制游戏时间
-	ctrGameTime(time){
+	ctrGameTime(){
 		if(this._gametimectr){
 			window.clearInterval(this._gametimectr);//清除上一关计时器
 		}
@@ -215,23 +226,40 @@ export default class main{
 		}
 	}
 
-  	//游戏结束后的触摸事件处理逻辑  再来一局按钮
+  	//游戏结束后的触摸事件处理逻辑  重新开始按钮
 	touchEventHandler(e) {
 	     e.preventDefault();
 
 	    let x = e.touches[0].clientX;
 	    let y = e.touches[0].clientY;
 
-	    let area = this.gameinfo.btnArea;// 获得按钮范围
-	    if (x >= area.startX
-        && x <= area.endX
-        && y >= area.startY
-        && y <= area.endY ){
-		   	ctx.clearRect(0, 0, canvas.width, canvas.height);// 清空canvas
-			Level = 0;//还原到第一关
-			this.gameStart = false;
-		    this.init();// 重新开始
-		}
+        // 获取按钮矩阵
+        let homeArea = this.gameinfo.homeArea;
+        let shareArea = this.gameinfo.shareArea;
+        let btnArea = this.gameinfo.btnArea;
+
+        // 重新游戏
+        this.__ClickRange({x:x,y:y},btnArea,()=>{
+            ctx.clearRect(0, 0, canvas.width, canvas.height);// 清空canvas
+            Level = 0;//还原到第一关
+            this.gameStart = false;
+            this.init();// 重新开始
+            cancelAnimationFrame(this.ctx2_Render_id);//停止ranking层的绘制
+        });
+
+        // 返回
+        this.__ClickRange({x:x,y:y},homeArea,()=>{
+            ctx.clearRect(0, 0, canvas.width, canvas.height);// 清空canvas
+            Level = 0;//还原到第一关
+            this.gameStart = false;
+            this.init();// 重新开始
+            cancelAnimationFrame(this.ctx2_Render_id);//停止ranking层的绘制
+        });
+
+        // 分享
+        this.__ClickRange({x:x,y:y},shareArea,()=>{
+            window.shareBTN();
+        });
 	}
 
 	// 进入下一关按钮回调
@@ -281,7 +309,6 @@ export default class main{
 	}
 
 	loop() {
-        // 排行榜
 		let that = this;
 		ctx.clearRect(0, 0, canvas.width, canvas.height);// 每帧清空
 		this.back.render();// 渲染背景
@@ -299,23 +326,36 @@ export default class main{
             ctx.font = "20px Microsoft YaHei";
             ctx.fillStyle = "#fff";
             ctx.fillText("第"+(Level+1)+"关",  10,  50);
-		}
+        }
 		/*游戏结束 如果游戏结束时通关了则渲染通关弹窗*/
 		if(databus.clearance){
+			// 通关
             this.alert.render("clearance",Level,databus.score);// 绘制通关界面
-            // 重新绑定事件
+
             canvas.removeEventListener('touchstart',this.touchCuttrees);
             this.touchCuttrees = that.clearanceHandler.bind(this);//事件处理函数
             canvas.addEventListener('touchstart', this.touchCuttrees);
             return
 		}else if (!databus.clearance&&(databus.gameOver||this.npc.blood<0.017)) {
-		  databus.gameOver = true;
-		  this.gameinfo.gameOver(databus.score);// 游戏结束 绘制结束UI
-		  // 重新绑定事件
-		  canvas.removeEventListener('touchstart',this.touchCuttrees);
-		  this.touchCuttrees = that.touchEventHandler.bind(this);//事件处理函数
-      	  canvas.addEventListener('touchstart', this.touchCuttrees);
-	      return
+			// 游戏结束
+		  	databus.gameOver = true;
+		  	this.gameinfo.gameOver(databus.score);// 游戏结束 绘制结束UI
+
+			// 创建第二层canvas
+			let ctx2 = canvas.getContext('2d');
+            //ctx2.drawImage(ctx,0,0);// 渲染game层
+			let _render = ()=>{
+                ctx2.clearRect(0, 0, canvas.width, canvas.height);// 每帧清空
+				ctx2.drawImage(sharedCanvas,0,0);// 渲染排行榜
+				requestAnimationFrame(_render);
+			};
+			this.ctx2_Render_id = requestAnimationFrame(_render);
+
+		  	// 重新绑定事件
+		  	canvas.removeEventListener('touchstart',this.touchCuttrees);
+		  	this.touchCuttrees = that.touchEventHandler.bind(this);//事件处理函数
+      	  	canvas.addEventListener('touchstart', this.touchCuttrees);
+	      	return
 	    }else{
 			if(this.gameStart){
                 this.gameinfo.render(databus.score);// 修改分数
@@ -340,9 +380,6 @@ export default class main{
             };//事件处理函数
             canvas.addEventListener('touchstart', this.touchCuttrees);
         }
-
-        ctx.drawImage(sharedCanvas,0,0);
-
 		// 每帧执行
 	 	window.requestAnimationFrame(
 	      this.loop.bind(this),
@@ -350,4 +387,11 @@ export default class main{
 	    )
 	}
 
+	// 排行榜
+    // RankingUI(){
+     //    ctx.drawImage(sharedCanvas,0,0);
+     //    window.requestAnimationFrame(
+     //        this.RankingUI.bind(this)
+     //    )
+	// }
 }
