@@ -1,5 +1,6 @@
 let screenWidth = wx.getSystemInfoSync().windowWidth;
 let screenHeight = wx.getSystemInfoSync().windowHeight;
+let ratio = wx.getSystemInfoSync().pixelRatio;
 let OBJsize = {
     // 主背景
     bg: {
@@ -46,8 +47,7 @@ let OBJsize = {
         this.renderOBJ = {
             bg: this.createIMG("tips/bg.png"),// 背景
             bg1: this.createIMG("tips/bg1.png"),// 子背景
-            btn: this.createIMG("tips/rank.png"),
-            item: this.createIMG("tips/header_bg.png")
+            btn: this.createIMG("tips/rank.png")
         };
         this.Message();//初始化事件监听
     }
@@ -86,6 +86,7 @@ let OBJsize = {
             if(res.type === 1){
                 _.status = 1;// 切换渲染模式
                 _.score = res.score;// 更新分数
+                _.MAXscore = res.score;// 最高分数
                 // 获取用户字段
                 wx.getUserCloudStorage({
                     keyList: ['score'],
@@ -129,42 +130,39 @@ let OBJsize = {
     render(){
         let self = this;
         let _size = OBJsize;// 对象尺寸
-        let _ = ()=>{
-            console.log("渲染离屏canvas  一次");
-            this._canvas.clearRect(0, 0, screenWidth, screenHeight);
-            if(self.status === 1){
-                // 背景
-                this._canvas.drawImage(this.renderOBJ.bg, _size.bg.x, _size.bg.y, _size.bg.w, _size.bg.h);
-                // 子背景
-                this._canvas.drawImage(this.renderOBJ.bg1, _size.bg1.x, _size.bg1.y, _size.bg1.w,_size.bg1.h);
-                // 按钮
-                this._canvas.drawImage(this.renderOBJ.btn, _size.btn.x, _size.btn.y, _size.btn.w, _size.btn.h);
-                // 分数
-                this._canvas.font = "bold 60px Microsoft YaHei";
-                this._canvas.textAlign="center";
-                this._canvas.textBaseline="middle";
-                // 阴影字体
-                this._canvas.fillStyle  = "#573300";
-                this._canvas.fillText(`${self.score}`, screenWidth/2,  (screenHeight/2)-(_size.bg.h)/2+_size.bg.h*0.15);
-                // 实际字体
-                this._canvas.fillStyle  = "#fdf1d3";
-                this._canvas.fillText(`${self.score}`, screenWidth/2,  (screenHeight/2)-(_size.bg.h)/2+_size.bg.h*0.14);
-                // 最高分
-                this._canvas.font = "900 18px Microsoft YaHei";
-                this._canvas.fillStyle  = "#573300";
-                this._canvas.fillText(`最佳记录: ${self.MAXscore}`, screenWidth/2,  (screenHeight/2)-(_size.bg.h)/2+_size.bg.h*0.28);
-                // 头像渲染
-                this.itemRender(1,3);
+        console.log("渲染离屏canvas  一次");
+        this._canvas.scale(ratio, ratio);
+        this._canvas.clearRect(0, 0, screenWidth*ratio, screenHeight*ratio);
 
-            }else if(self.status === 2){
+        if(self.status === 1){
+            // 背景
+            this._canvas.drawImage(this.renderOBJ.bg, _size.bg.x, _size.bg.y, _size.bg.w, _size.bg.h);
+            // 子背景
+            this._canvas.drawImage(this.renderOBJ.bg1, _size.bg1.x, _size.bg1.y, _size.bg1.w,_size.bg1.h);
+            // 按钮
+            this._canvas.drawImage(this.renderOBJ.btn, _size.btn.x, _size.btn.y, _size.btn.w, _size.btn.h);
+            // 分数
+            this._canvas.font = "bold 60px Microsoft YaHei";
+            this._canvas.textAlign="center";
+            this._canvas.textBaseline="middle";
+            // 阴影字体
+            this._canvas.fillStyle  = "#573300";
+            this._canvas.fillText(`${self.score}`, screenWidth/2,  (screenHeight/2)-(_size.bg.h)/2+_size.bg.h*0.15);
+            // 实际字体
+            this._canvas.fillStyle  = "#fdf1d3";
+            this._canvas.fillText(`${self.score}`, screenWidth/2,  (screenHeight/2)-(_size.bg.h)/2+_size.bg.h*0.14);
+            // 最高分
+            this._canvas.font = "900 18px Microsoft YaHei";
+            this._canvas.fillStyle  = "#573300";
+            this._canvas.fillText(`最佳记录: ${self.MAXscore}`, screenWidth/2,  (screenHeight/2)-(_size.bg.h)/2+_size.bg.h*0.28);
+            // 头像渲染
+            this.itemRender(1,3);
 
-            }else if(self.status === 3){
+        }else if(self.status === 2){
 
-            }
-            //requestAnimationFrame(_.bind(this));
-        };
-        //requestAnimationFrame(_.bind(this));
-        _();
+        }else if(self.status === 3){
+
+        }
     }
 
     // 玩家渲染

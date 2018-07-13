@@ -29,6 +29,10 @@ let npcMove = 'images/npcMove.png';
 let npcDie = 'images/npcDie.png';
 let npctexture = 'images/npc.png';
 
+// 离屏canvas
+let openDataContext = wx.getOpenDataContext();
+let sharedCanvas = openDataContext.canvas;
+
 // 背景贴图
 let bg = 'images/bg.png';
 
@@ -36,15 +40,26 @@ export default class main{
 	constructor(){
 		// 控制帧循环
 		this._loop = null;
-		// this._Ranking = null;
+		this.ranking = false;//排行榜控制
         this.gameStart = false;// 游戏运行状态控制
         this.helpStatus = false;// 帮助界面
 		Level = 0;// 关卡控制
         this._gametimectr=null;// 游戏时间计时器对象
 		this.touchCuttrees=null;//事件回调队列
 		WxModular.share();// 开启分享功能
-        sharedCanvas.width = screenWidth;
-        sharedCanvas.height = screenHeight;
+        sharedCanvas.width = screenWidth*(wx.getSystemInfoSync().pixelRatio);
+        sharedCanvas.height = screenHeight*(wx.getSystemInfoSync().pixelRatio);
+
+        // -----------------  DEMO
+        wx.postMessage({type:1,score:40});
+        let _render = ()=>{
+            ctx.drawImage(sharedCanvas,0,0,screenWidth,screenHeight);// 渲染排行榜
+            requestAnimationFrame(_render);
+        };
+        requestAnimationFrame(_render);
+        return;
+        // -----------------  DEMO
+
 		this.init();
 	}
 
@@ -52,11 +67,9 @@ export default class main{
         // 清空上一个计时器和帧循环
 		window.clearInterval(this._gametimectr);
         cancelAnimationFrame(this._loop);
-        // cancelAnimationFrame(this._Ranking);
 		databus.reset();// 重置状态
 		canvas.removeEventListener('touchstart',this.touchCuttrees);// 移除事件
 		wx.triggerGC();// 调起js内存回收
-       //WxModular.Ranking(4);// 关闭排行榜
 
         this.Aggressivity = GLOBAL.Level[Level].Aggressivity;// 当前攻击力
         this.hp = GLOBAL.Level[Level].hp;// 当前总血量
@@ -90,12 +103,6 @@ export default class main{
 	      this.loop.bind(this),
 	      canvas
 	    );
-
-		// 排行榜渲染
-        // this._Ranking =  window.requestAnimationFrame(
-         //    this.RankingUI.bind(this),
-         //    canvas
-        // );
 	}
 
 	// 控制游戏时间
@@ -244,7 +251,8 @@ export default class main{
             Level = 0;//还原到第一关
             this.gameStart = false;
             this.init();// 重新开始
-            cancelAnimationFrame(this.ctx2_Render_id);//停止ranking层的绘制
+			this.ranking = false;
+            //cancelAnimationFrame(this.ctx2_Render_id);//停止ranking层的绘制
         });
 
         // 返回
@@ -253,7 +261,7 @@ export default class main{
             Level = 0;//还原到第一关
             this.gameStart = false;
             this.init();// 重新开始
-            cancelAnimationFrame(this.ctx2_Render_id);//停止ranking层的绘制
+			this.ranking = false;
         });
 
         // 分享
@@ -341,21 +349,21 @@ export default class main{
 		  	databus.gameOver = true;
 		  	this.gameinfo.gameOver(databus.score);// 游戏结束 绘制结束UI
 
-			// 创建第二层canvas
-			let ctx2 = canvas.getContext('2d');
-            //ctx2.drawImage(ctx,0,0);// 渲染game层
+			// 渲染排行榜
+            that.ranking = true;
 			let _render = ()=>{
-                ctx2.clearRect(0, 0, canvas.width, canvas.height);// 每帧清空
-				ctx2.drawImage(sharedCanvas,0,0);// 渲染排行榜
+				if(!that.ranking)return;
+                ctx.drawImage(sharedCanvas,0,0,screenWidth,screenHeight);// 渲染排行榜
 				requestAnimationFrame(_render);
 			};
-			this.ctx2_Render_id = requestAnimationFrame(_render);
+			requestAnimationFrame(_render);
 
 		  	// 重新绑定事件
 		  	canvas.removeEventListener('touchstart',this.touchCuttrees);
 		  	this.touchCuttrees = that.touchEventHandler.bind(this);//事件处理函数
       	  	canvas.addEventListener('touchstart', this.touchCuttrees);
-	      	return
+	      	return;
+
 	    }else{
 			if(this.gameStart){
                 this.gameinfo.render(databus.score);// 修改分数
@@ -386,12 +394,4 @@ export default class main{
 	      canvas
 	    )
 	}
-
-	// 排行榜
-    // RankingUI(){
-     //    ctx.drawImage(sharedCanvas,0,0);
-     //    window.requestAnimationFrame(
-     //        this.RankingUI.bind(this)
-     //    )
-	// }
 }
