@@ -8,15 +8,10 @@ import Tool from './base/tool.js'
 import Index from './base/index.js'
 import Alert from './base/alert.js'
 
-let Level = 0;// 当前关卡
-
-let ctx = canvas.getContext('2d');
-let audioObj = new Audio();// 创建音频实例
-let databus = new Databus();// 游戏状态
-let Tools = new Tool();// 创建工具类
-
 let screenHeight = window.innerHeight;
 let screenWidth  = window.innerWidth;
+
+let Level = 0;// 当前关卡
 
 // 树贴图
 let treeLeft = "images/treeLeft.png";
@@ -29,12 +24,24 @@ let npcMove = 'images/npcMove.png';
 let npcDie = 'images/npcDie.png';
 let npctexture = 'images/npc.png';
 
+// 背景贴图
+let bg = 'images/bg.png';
+
 // 离屏canvas
 let openDataContext = wx.getOpenDataContext();
 let sharedCanvas = openDataContext.canvas;
+let ratio = wx.getSystemInfoSync().pixelRatio;
+sharedCanvas.width = screenWidth*ratio;
+sharedCanvas.height = screenHeight*ratio;
 
-// 背景贴图
-let bg = 'images/bg.png';
+// 上屏canvas
+let ctx = canvas.getContext('2d');
+let audioObj = new Audio();// 创建音频实例
+let databus = new Databus();// 游戏状态
+let Tools = new Tool();// 创建工具类
+canvas.width = screenWidth * ratio;
+canvas.height = screenHeight * ratio;
+ctx.scale(ratio,ratio);
 
 export default class main{
 	constructor(){
@@ -47,19 +54,7 @@ export default class main{
         this._gametimectr=null;// 游戏时间计时器对象
 		this.touchCuttrees=null;//事件回调队列
 		WxModular.share();// 开启分享功能
-        sharedCanvas.width = screenWidth*(wx.getSystemInfoSync().pixelRatio);
-        sharedCanvas.height = screenHeight*(wx.getSystemInfoSync().pixelRatio);
-
-        // -----------------  DEMO
-        wx.postMessage({type:1,score:40});
-        let _render = ()=>{
-            ctx.drawImage(sharedCanvas,0,0,screenWidth,screenHeight);// 渲染排行榜
-            requestAnimationFrame(_render);
-        };
-        requestAnimationFrame(_render);
-        return;
-        // -----------------  DEMO
-
+        this.anklist = false; // 开启好友排行榜
 		this.init();
 	}
 
@@ -111,6 +106,10 @@ export default class main{
 			window.clearInterval(this._gametimectr);//清除上一关计时器
 		}
 		let _ = window.setInterval(()=>{
+			if(databus.gameOver){
+                window.clearInterval(this._gametimectr);//清除上一关计时器
+				return;
+			}
             this.npc.currentTime<=0?this.npc.currentTime=0:this.npc.currentTime-=10;
 			if(this.npc.currentTime<=0){
 				window.clearInterval(_);//清空定时器
@@ -204,10 +203,11 @@ export default class main{
         let _rankList = this.IndexUI.rankListRange;
         let _game = this.IndexUI.gameRange;
 
-        // 判断
+        // 开始游戏
 		this.__ClickRange({x:x,y:y},_play,()=>{
             this.gameStart = true;// 开始游戏 并关闭index弹窗
             this.helpStatus = true;// 开启游戏帮助界面
+            this.anklist = false;
 		});
 		// 分享
 		this.__ClickRange({x:x,y:y},_share,()=>{
@@ -215,7 +215,8 @@ export default class main{
 		});
 		// 排行榜
 		this.__ClickRange({x:x,y:y},_rankList,()=>{
-
+			this.anklist = true;
+			WxModular.Ranking(2);
 		});
 		// 更多游戏
 		this.__ClickRange({x:x,y:y},_game,()=>{
@@ -328,7 +329,7 @@ export default class main{
 		}
 
 		// 开始游戏控制
-		if(this.gameStart&&!databus.clearance&&!this.helpStatus){
+		if(this.gameStart&&!databus.clearance&&!this.helpStatus&&!databus.gameOver){
             this.npc.renderLifebar();// 生命值
             // 渲染关卡文本
             ctx.font = "20px Microsoft YaHei";
@@ -336,10 +337,9 @@ export default class main{
             ctx.fillText("第"+(Level+1)+"关",  10,  50);
         }
 		/*游戏结束 如果游戏结束时通关了则渲染通关弹窗*/
-		if(databus.clearance){
+		if(databus.clearance&&!databus.gameOver){
 			// 通关
             this.alert.render("clearance",Level,databus.score);// 绘制通关界面
-
             canvas.removeEventListener('touchstart',this.touchCuttrees);
             this.touchCuttrees = that.clearanceHandler.bind(this);//事件处理函数
             canvas.addEventListener('touchstart', this.touchCuttrees);
@@ -348,22 +348,11 @@ export default class main{
 			// 游戏结束
 		  	databus.gameOver = true;
 		  	this.gameinfo.gameOver(databus.score);// 游戏结束 绘制结束UI
-
-			// 渲染排行榜
-            that.ranking = true;
-			let _render = ()=>{
-				if(!that.ranking)return;
-                ctx.drawImage(sharedCanvas,0,0,screenWidth,screenHeight);// 渲染排行榜
-				requestAnimationFrame(_render);
-			};
-			requestAnimationFrame(_render);
-
+			ctx.drawImage(sharedCanvas,0,0,screenWidth,screenHeight);// 渲染排行榜
 		  	// 重新绑定事件
 		  	canvas.removeEventListener('touchstart',this.touchCuttrees);
 		  	this.touchCuttrees = that.touchEventHandler.bind(this);//事件处理函数
       	  	canvas.addEventListener('touchstart', this.touchCuttrees);
-	      	return;
-
 	    }else{
 			if(this.gameStart){
                 this.gameinfo.render(databus.score);// 修改分数
@@ -372,6 +361,10 @@ export default class main{
 
         if(!this.gameStart){
             this.IndexUI.render();// 渲染indexui
+            // 好友排行榜开启
+            if(that.anklist){
+                ctx.drawImage(sharedCanvas,0,0,screenWidth,screenHeight);// 渲染排行榜
+            }
             canvas.removeEventListener('touchstart',this.touchCuttrees);
             this.touchCuttrees = that.touchEventStartGame.bind(this);//事件处理函数
             canvas.addEventListener('touchstart', this.touchCuttrees);

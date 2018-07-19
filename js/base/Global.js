@@ -11,4 +11,22 @@ const GLOBAL = {
         {time: 50,hp: 2000,Aggressivity: 190,Enemy:24},
     ]
 };
+
+function getBase64(url,callback){
+    let Img = wx.createImage(),dataURL='';
+    Img.src=url;
+    Img.onload=function(){ //要先确保图片完整获取到，这是个异步事件
+        let canvas = wx.createCanvas(), //创建canvas元素
+            width=Img.width, //确保canvas的尺寸和图片一样
+            height=Img.height;
+        canvas.width=width;
+        canvas.height=height;
+        canvas.getContext("2d").drawImage(Img,0,0,width,height); //将图片绘制到canvas中
+        let ext = url.substring(url.lastIndexOf(".")+1).toLowerCase();
+        dataURL=canvas.toDataURL(`image/${ext}`); //转换图片为dataURL
+        callback?callback(dataURL):null; //调用回调函数
+    };
+}
+
 window.GLOBAL = GLOBAL;
+window.getBase64 = getBase64;
