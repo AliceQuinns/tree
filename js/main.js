@@ -186,7 +186,7 @@ export default class main{
 		isCollision&&(databus.gameOver = true)&&(this.npc.update(npcDie));
 		if(databus.gameOver){
             Tools.getshock(2);// 震动
-			WxModular.Ranking(1,databus.score);// 开启得分面板
+			wx.postMessage({type: 1,data: {score: databus.score}})
 		}
 	}
 
@@ -208,6 +208,7 @@ export default class main{
             this.gameStart = true;// 开始游戏 并关闭index弹窗
             this.helpStatus = true;// 开启游戏帮助界面
             this.anklist = false;
+            window.GROUPSHARE = false;
 		});
 		// 分享
 		this.__ClickRange({x:x,y:y},_share,()=>{
@@ -381,6 +382,12 @@ export default class main{
             };//事件处理函数
             canvas.addEventListener('touchstart', this.touchCuttrees);
         }
+
+        // 群排行
+        if(window.GROUPSHARE){
+            ctx.drawImage(sharedCanvas,0,0,screenWidth,screenHeight);// 渲染排行榜
+        }
+
 		// 每帧执行
 	 	window.requestAnimationFrame(
 	      this.loop.bind(this),

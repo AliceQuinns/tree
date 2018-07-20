@@ -1,44 +1,121 @@
-// 离屏 sharedCanvas
+
+// // 得分面板
+// wx.postMessage({
+//     type: 1,
+//     data:{
+//         score: 18
+//     },
+//     style: {
+//         top: 150// px为单位 如果不传入该参数则默认居中
+//     }
+// });
+// // 好友排行榜
+// wx.postMessage({
+//     type: 2,
+//     style: {
+//         top: 150// px为单位 如果不传入该参数则默认居中
+//     }
+// });
+// // 群排行榜
+// wx.postMessage({
+//     type: 3,
+//     data: {
+//         shareTicket: "" // 通过wx.onShow(callback)可获取shareTicket字段
+//     },
+//     style: {
+//         top: 150// px为单位 如果不传入该参数则默认居中
+//     }
+// });
+// // 比分
+// wx.postMessage({
+//     type: 4,
+//     data: {
+//         score: 18,// 当前得分
+//     },
+//     style: {
+//         top: 150,// px为单位 如果不传入垂直坐标则默认为 150
+//         left: 150// px为单位 如果不传水平坐标则默认居中
+//     }
+// });
+
+
+
+// 主屏sharedCanvas
 let sharedCanvas = wx.getSharedCanvas();
 let context = sharedCanvas.getContext("2d");
-// 离屏 canvas 好友排行榜
+// 普通离屏canvas 好友排行榜 群排行榜
 let itemCanvas = wx.createCanvas();
 let ctx = itemCanvas.getContext('2d');
+// 普通离屏canvas 比分
+let MatchCanvas = wx.createCanvas();
+let Match = MatchCanvas.getContext('2d');
 
+// 设备实际尺寸和缩放
 const screenWidth = wx.getSystemInfoSync().screenWidth;
 const screenHeight = wx.getSystemInfoSync().screenHeight;
 const ratio = wx.getSystemInfoSync().pixelRatio;
 
+// 全局变量
 let myScore = 0;// 最高分数
 let myInfo = {};// 玩家信息
 let myRank = null;// 玩家名次
 let _renderStatus = 0;//渲染状态
 let _score =0;//当前分数
+// 比分面板
+let _match_content = {
+    userData: [],//好友数据
+    status: false,
+    top: 150,
+    left: 150,
+    score: 0
+};
 
 init();
 
 // 初始化
 function init() {
-  context.restore();// 状态还原
+  // canvas适配
+  context.restore();
   context.scale(ratio, ratio);
   context.clearRect(0, 0, screenWidth * ratio, screenHeight * ratio);
   let scales = screenWidth / 750;
   context.scale(scales, scales);
-  // 事件
+  // 定时更新好友数据
+  getTimeFriend();
+  // 数据事件
   event();
-  // 滑动
+  // 触摸滑动
   touch();
+  console.log("排行榜开启成功")
+}
+
+function getTimeFriend(){
+    window.setInterval(()=>{
+        getFriendsRanking("score",(data)=>{
+            console.log("获取到好友数据",data,"当前玩家排名",myRank);
+            _match_content.userData = data;
+        })
+    },60000);// 每分钟更新一次排行榜
+}
+
+// 分数对比
+function scorecompare(){
+    if(!_match_content.score)return false;
+    _match_content.userData.map((item,index)=>{
+        console.log(item);
+    })
 }
 
 // 渲染函数
-function render(type) {
+function render(type,data) {
     _renderStatus = type;// 切换渲染状态
     context.restore();// 状态还原
-    // 清空像素点
-    context.clearRect(0, 0, screenWidth*ratio, screenHeight*ratio);
-    sharedCanvas.width = sharedCanvas.width;
-    sharedCanvas.height = sharedCanvas.height;
+    if(type === 4 || _match_content.status){
+        // 比分面板
+        let _ = scorecompare(); // 即将超越的玩家
+    }
     if(type === 1){
+        context.clearRect(0, 0, screenWidth*ratio, screenHeight*ratio);
         /* 得分面板 */
         let _size = OBJsize;// 坐标矩阵
         getMyScore(()=>{
@@ -71,8 +148,9 @@ function render(type) {
                 };
             };
         });
-    }else if(type === 2){
-        // 标题框
+    }
+    else if(type === 2){
+        context.clearRect(0, 0, screenWidth*ratio, screenHeight*ratio);
         RoundRect(80,OBJsize.frends.top,750 - 80 * 2,100,30,context,OBJsize.frends.titleColor);
         // 好友排行榜
         context.fillStyle = '#ffffff';
@@ -80,21 +158,20 @@ function render(type) {
         context.textAlign = 'center';
         context.fillText('好友排行', 750 / 2, OBJsize.frends.top+40);
         getFriendsRanking("render");// 绘制好友排行榜
-    }else if(type === 3){
-
-    }else if(type === 4){
-
+    }
+    else if(type === 3){
+        context.clearRect(0, 0, screenWidth*ratio, screenHeight*ratio);
+        RoundRect(80,OBJsize.frends.top,750 - 80 * 2,100,30,context,OBJsize.frends.titleColor);
+        // 群排行榜
+        context.fillStyle = '#ffffff';
+        context.font = '35px Arial';
+        context.textAlign = 'center';
+        context.fillText('群排行榜', 750 / 2, OBJsize.frends.top+40);
+        initRanklist(sortByScore(data));// 群排行榜
     }
 }
 
-// 创建图片节点
-function createIMG(src){
-    let target = wx.createImage();
-    target.src = src;
-    return target;
-}
-
-// 玩家渲染
+// 得分面板玩家渲染
 function itemRender(size){
     // 得分渲染
     getFriendsRanking("score",(userdatas)=>{
@@ -310,7 +387,7 @@ function getFriendsRanking(type,callback) {
     success: res => {
       let data = res.data;
       if(type === "render")initRanklist(sortByScore(data));
-      if(!!callback)callback(sortByScore(data));
+      if(!!callback)callback(sortByScore(data));// 传入排序后的好友数据
     },
     fail: err => {
         console.log(err,"无法获取好友信息");
@@ -327,8 +404,7 @@ function getGroupRanking(ticket) {
       console.log('getGroupCloudStorage:success');
       console.log(res.data);
       let data = res.data;
-      initRanklist(sortByScore(data));
-      //drawMyRank();
+      render(3,data);
     },
     fail: res => {
       console.log('getGroupCloudStorage:fail');
@@ -356,24 +432,42 @@ function RoundRect(x, y, w, h, r,target,color){
 
 // 消息事件
 function event(){
-    wx.onMessage(data => {
-        console.log("传入开放域的数据为===========",data);
-        if(!data.type){console.info("请传入需要开启的面板类型");return;}
+    wx.onMessage(res => {
+        console.log("传入开放域的数据为===========",res);
+        if(!res.type){console.info("请传入需要开启的面板类型");return;}
 
-        if (Number(data.type) === 1) {
+        if (Number(res.type) === 1) {
             // 得分面板
-            _score = data.score;
-            render(1);
-        }else if(Number(data.type) === 2){
+            if(res.data.score){
+                _score = Number(res.data.score);
+                render(1);
+            }else{
+                console.log("未传入分数");
+            }
+        }else if(Number(res.type) === 2){
             // 好友排行
             render(2);
-        }else if (Number(data.type) === 3) {
-            // // 群排行
-            // getGroupRanking(data.text);
-            // getMyScore();
-        } else if (data.type === 4) {
-            // // 更新最高分
-            // getMyScore();
+        }else if (Number(res.type) === 3) {
+            // 群排行
+            if(res.data.shareTicket){
+                getGroupRanking(res.data.shareTicket);
+            }else{
+                console.log("无群分享shareTicket字段");
+            }
+        } else if (Number(res.type) === 4) {
+            if(res.data.close){
+                // 关闭比分面板
+                _match_content.status = false;
+            }else if(res.data.score){
+                // 开启比分面板
+                _match_content.status = true;
+                _match_content.score = res.data.score;
+                if(!!res.style.top)_match_content.top=res.style.top;
+                if(!!res.style.left)_match_content.left=res.style.left;
+                render(4);
+            }else{
+                console.log("未传入当前得分");
+            }
         }
     });
 }
@@ -388,7 +482,7 @@ function touch(){
             startY = touch.clientY + moveY;
         }
         moveY = startY - touch.clientY;
-        if(_renderStatus === 2){
+        if(_renderStatus === 2 || _renderStatus === 3){
             reDrawItem(moveY);
         }
     });
@@ -399,7 +493,7 @@ function touch(){
         } else if (moveY > itemCanvas.height - 590) { // 到底
             moveY = itemCanvas.height - 590;
         }
-        if(_renderStatus === 2) {
+        if(_renderStatus === 2 || _renderStatus === 3) {
             reDrawItem(moveY);
         }
     });
@@ -412,30 +506,23 @@ var OBJsize = {
         top: 300,// 好友排行榜Y轴坐标
         titleColor: "#3ec9ff"// “好友排行” 背景色
     },
-    // 得分面板
-    // 主背景
+    // 得分面板主背景
     bg: {
         w: Math.round(750 - 80 * 2),
         h: 620,
         x: 80,
         y: 350
     },
-    // 子背景
+    // 得分面板子背景
     bg1: {
         w: Math.round(750 - 80 * 2.7),
         h: 320,
         x: ((750 - 80 * 2)-(750 - 80 * 2.7))/2+80,
         y: 350+300-30
     },
-    // 玩家头像
+    // 得分面板玩家头像
     item1: {
         w: Math.round(150),
         h: Math.round(150)
     },
-};
-
-// 渲染对象缓存
-var renderOBJ = {
-    bg: createIMG("tips/bg.png"),// 背景
-    bg1: createIMG("tips/bg1.png"),// 子背景
 };
