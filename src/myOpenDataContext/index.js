@@ -1,44 +1,44 @@
+// ui元素坐标信息
+var OBJsize = {
+    // 好友排行与群排行ui
+    frends: {
+        width: 590,
+        height: 620,
+        top: 300,// Y轴坐标
+        left: 80,// X轴坐标
+        titleColor: "#3ec9ff"// “好友排行” 背景色
+    },
+    // 得分面板主背景
+    bg: {
+        w: 590,
+        h: 620,
+        x: 80,
+        y: 350
+    },
+    // 得分面板子背景
+    bg1: {
+        w: Math.round(750 - 80 * 2.7),
+        h: 320,
+        x: ((750 - 80 * 2)-(750 - 80 * 2.7))/2+80,
+        y: 350+300-30
+    },
+    // 得分面板玩家头像
+    item1: {
+        w: Math.round(150),
+        h: Math.round(150)
+    },
+};
 
-// // 得分面板
-// wx.postMessage({
-//     type: 1,
-//     data:{
-//         score: 18
-//     },
-//     style: {
-//         top: 150// px为单位 如果不传入该参数则默认居中
-//     }
-// });
-// // 好友排行榜
-// wx.postMessage({
-//     type: 2,
-//     style: {
-//         top: 150// px为单位 如果不传入该参数则默认居中
-//     }
-// });
-// // 群排行榜
-// wx.postMessage({
-//     type: 3,
-//     data: {
-//         shareTicket: "" // 通过wx.onShow(callback)可获取shareTicket字段
-//     },
-//     style: {
-//         top: 150// px为单位 如果不传入该参数则默认居中
-//     }
-// });
-// // 比分
-// wx.postMessage({
-//     type: 4,
-//     data: {
-//         score: 18,// 当前得分
-//     },
-//     style: {
-//         top: 150,// px为单位 如果不传入垂直坐标则默认为 150
-//         left: 150// px为单位 如果不传水平坐标则默认居中
-//     }
-// });
-
-
+// 比分面板 元素定位信息
+var _match_content = {
+    initData: [],// 待超越好友
+    status: false,
+    width: 120,
+    height: 170,
+    top: 150,
+    left: 630,
+    score: 0 // 玩家实时分数
+};
 
 // 主屏sharedCanvas
 let sharedCanvas = wx.getSharedCanvas();
@@ -46,9 +46,6 @@ let context = sharedCanvas.getContext("2d");
 // 普通离屏canvas 好友排行榜 群排行榜
 let itemCanvas = wx.createCanvas();
 let ctx = itemCanvas.getContext('2d');
-// 普通离屏canvas 比分
-let MatchCanvas = wx.createCanvas();
-let Match = MatchCanvas.getContext('2d');
 
 // 设备实际尺寸和缩放
 const screenWidth = wx.getSystemInfoSync().screenWidth;
@@ -60,15 +57,8 @@ let myScore = 0;// 最高分数
 let myInfo = {};// 玩家信息
 let myRank = null;// 玩家名次
 let _renderStatus = 0;//渲染状态
+let myself = {};// 玩家自身信息
 let _score =0;//当前分数
-// 比分面板
-let _match_content = {
-    userData: [],//好友数据
-    status: false,
-    top: 150,
-    left: 150,
-    score: 0
-};
 
 init();
 
@@ -79,8 +69,8 @@ function init() {
   context.scale(ratio, ratio);
   context.clearRect(0, 0, screenWidth * ratio, screenHeight * ratio);
   let scales = screenWidth / 750;
-  context.scale(scales, scales);
-  // 定时更新好友数据
+  context.scale(scales, screenHeight / 1280);
+  // 获取好友数据
   getTimeFriend();
   // 数据事件
   event();
@@ -89,34 +79,82 @@ function init() {
   console.log("排行榜开启成功")
 }
 
+// 获取全部待超越好友数据
 function getTimeFriend(){
-    window.setInterval(()=>{
-        getFriendsRanking("score",(data)=>{
-            console.log("获取到好友数据",data,"当前玩家排名",myRank);
-            _match_content.userData = data;
-        })
-    },60000);// 每分钟更新一次排行榜
+    getFriendsRanking("score",(data)=>{
+        myself = data[myRank-1];//玩家自己信息
+        _match_content.initData = data.slice(0,myRank-1);
+    });
 }
 
-// 分数对比
+// 分析下一个待超越好友
 function scorecompare(){
-    if(!_match_content.score)return false;
-    _match_content.userData.map((item,index)=>{
-        console.log(item);
-    })
+    let content = null,type = 1;
+    if(!_match_content.score||!_match_content.initData)content =  myself;
+    let _ = ()=>{
+        if(_match_content.initData.length<=0){content = myself;type=2}//达到第一名
+        else{
+            let target = Number(_match_content.initData[_match_content.initData.length-1].score);
+            if(Number(_match_content.score)>target){
+                _match_content.initData.pop();//删除已经超过的好友
+                _();// 递归
+            }
+            else{
+                content =  _match_content.initData[_match_content.initData.length-1]
+            }
+        }
+    };
+    _();
+    return {data:content,type:type};
 }
 
 // 渲染函数
 function render(type,data) {
     _renderStatus = type;// 切换渲染状态
     context.restore();// 状态还原
-    if(type === 4 || _match_content.status){
-        // 比分面板
+    context.clearRect(0, 0, 750, 1280);//清空像素
+    // 好友比分
+    if(_match_content.status){
         let _ = scorecompare(); // 即将超越的玩家
+        let header = wx.createImage();
+        header.src = _.data.avatarUrl;
+        header.onload = ()=>{
+            context.clearRect(_match_content.left,_match_content.top,_match_content.width,_match_content.height);
+            context.font = '22px Arial';
+            context.textAlign = 'center';
+            context.textBaseline = 'alphabetic';
+            // 背景
+            context.fillStyle = "rgba(0,0,0,0.5)";
+            context.fillRect(_match_content.left,_match_content.top,_match_content.width,_match_content.height);
+            // 头像
+            context.drawImage(header,_match_content.left+_match_content.width*.1,_match_content.top+35,_match_content.width*.8,90);
+            // 字体截取
+            let name = _.data.nickname;//姓名
+            let fontWidth = context.measureText(name);
+            // 限制字体宽度
+            var filterFont =()=>{
+                if(fontWidth.width>=_match_content.width){
+                    name = name.slice(0,name.length-1);
+                    fontWidth = context.measureText(name);
+                    filterFont();
+                }
+            };
+            filterFont();
+            context.fillStyle = '#ffffff';
+            context.fillText("即将超越", _match_content.left+_match_content.width/2, _match_content.top+25);
+            context.font = '20px Arial';
+            context.fillText(name, _match_content.left+_match_content.width/2, _match_content.top+145);
+            context.fillStyle = '#fcff0b';
+            if(_.type === 2){
+                context.fillText(_match_content.score, _match_content.left+_match_content.width/2, _match_content.top+165);
+            }else{
+                context.fillText(_.data.score, _match_content.left+_match_content.width/2, _match_content.top+165);
+            }
+        };
     }
+    // 得分面板
     if(type === 1){
-        context.clearRect(0, 0, screenWidth*ratio, screenHeight*ratio);
-        /* 得分面板 */
+        context.save();
         let _size = OBJsize;// 坐标矩阵
         getMyScore(()=>{
             // 背景
@@ -129,8 +167,9 @@ function render(type,data) {
                 bg1.src = "tips/bg1.png";
                 bg1.onload =function(){
                     context.drawImage(bg1, _size.bg1.x, _size.bg1.y, _size.bg1.w,_size.bg1.h);
+                    context.font = "14px";
                     // 分数
-                    context.font = "bold 160px Microsoft YaHei";
+                    context.font = "160px Arial";
                     context.textAlign="center";
                     context.textBaseline="middle";
                     // 阴影字体
@@ -140,7 +179,7 @@ function render(type,data) {
                     context.fillStyle  = "#fdf1d3";
                     context.fillText(`${_score}`, 750 / 2, _size.bg.y+110);
                     // 最高分
-                    context.font = "900 40px Microsoft YaHei";
+                    context.font = "40px Arial";
                     context.fillStyle  = "#573300";
                     context.fillText(`最佳记录: ${myScore}`, 750 / 2,  Math.round(_size.bg.y+225));
                     // 头像渲染
@@ -148,26 +187,15 @@ function render(type,data) {
                 };
             };
         });
+        context.restore();
     }
+    // 好友排行榜
     else if(type === 2){
-        context.clearRect(0, 0, screenWidth*ratio, screenHeight*ratio);
-        RoundRect(80,OBJsize.frends.top,750 - 80 * 2,100,30,context,OBJsize.frends.titleColor);
-        // 好友排行榜
-        context.fillStyle = '#ffffff';
-        context.font = '35px Arial';
-        context.textAlign = 'center';
-        context.fillText('好友排行', 750 / 2, OBJsize.frends.top+40);
         getFriendsRanking("render");// 绘制好友排行榜
     }
+    // 群排行榜
     else if(type === 3){
-        context.clearRect(0, 0, screenWidth*ratio, screenHeight*ratio);
-        RoundRect(80,OBJsize.frends.top,750 - 80 * 2,100,30,context,OBJsize.frends.titleColor);
-        // 群排行榜
-        context.fillStyle = '#ffffff';
-        context.font = '35px Arial';
-        context.textAlign = 'center';
-        context.fillText('群排行榜', 750 / 2, OBJsize.frends.top+40);
-        initRanklist(sortByScore(data));// 群排行榜
+        initRanklist(sortByScore(data),3);// 群排行榜
     }
 }
 
@@ -184,6 +212,7 @@ function itemRender(size){
             let img = wx.createImage();
             img.src = userdatas[i].avatarUrl;
             img.onload = ()=>{
+                if(_renderStatus !== 1)return;                
                 // 头像
                 context.drawImage(
                     img,
@@ -192,37 +221,41 @@ function itemRender(size){
                     OBJsize.item1.w,
                     OBJsize.item1.h
                 );
+                context.restore();
+                // 名称
+                let text = userdatas[i].nickname;
+                if(text.length>=6)text = text.slice(0,5);
+                // 姓名
+                context.font = "30px Arial";
+                context.textAlign="center";
+                context.fillStyle  = "#fdf1d3";
+                context.fillText(
+                    `${text}`,
+                    Math.round(imgPos.x+OBJsize.item1.w/2),
+                    Math.round(OBJsize.item1.h+imgPos.y+30));
+                // 排名
+                context.font = "50px Arial";
+                context.fillText(
+                    `${i+1}`,
+                    Math.round(imgPos.x+OBJsize.item1.w/2),
+                    Math.round(imgPos.y-40));
+                // 分数
+                context.font = "30px Arial";
+                context.fillStyle = "#fff7dd";
+                context.fillText(
+                    `${userdatas[i].score}`,
+                    Math.round(imgPos.x+OBJsize.item1.w/2),
+                    Math.round(OBJsize.item1.h+imgPos.y+70));
+                context.save();
             };
-            // 名称
-            let text = userdatas[i].nickname;
-            if(text.length>=6)text = text.slice(0,5);
-            // 姓名
-            context.font = "900 30px Microsoft YaHei";
-            context.textAlign="center";
-            context.fillStyle  = "#fdf1d3";
-            context.fillText(
-                `${text}`,
-                Math.round(imgPos.x+OBJsize.item1.w/2),
-                Math.round(OBJsize.item1.h+imgPos.y+30));
-            // 排名
-            context.font = "900 50px Microsoft YaHei";
-            context.fillText(
-                `${i+1}`,
-                Math.round(imgPos.x+OBJsize.item1.w/2),
-                Math.round(imgPos.y-40));
-            // 分数
-            context.font = "600 30px Microsoft YaHei";
-            context.fillStyle = "#fff7dd";
-            context.fillText(
-                `${userdatas[i].score}`,
-                Math.round(imgPos.x+OBJsize.item1.w/2),
-                Math.round(OBJsize.item1.h+imgPos.y+70));
         }
     });
 }
 
-// 好友排行榜渲染
-function initRanklist(list) {
+// 好友排行榜 群排行榜渲染
+function initRanklist(list,type) {
+    console.log(list);
+  if(Number(_renderStatus) != 2 && Number(_renderStatus) !=  3)return;
   let length = Math.max(list.length, 6);// 最少渲染6条
 
   // 离屏canvas尺寸
@@ -230,7 +263,7 @@ function initRanklist(list) {
   itemCanvas.width = (750 - 80 * 2);
   itemCanvas.height = itemHeight * length;
 
-  // 用户信息框
+  // 用户背景框绘制
   for (let i = 0; i < length; i++) {
     if (i % 2 === 0) {
       ctx.fillStyle = '#ffffff';
@@ -268,7 +301,22 @@ function initRanklist(list) {
   } else {
     // 没有数据
   }
-  reDrawItem(0);
+    if(type === 2){
+        // 好友面板
+        RoundRect(OBJsize.frends.left,OBJsize.frends.top,OBJsize.frends.width,100,30,context,OBJsize.frends.titleColor);//标题框
+        context.fillStyle = '#ffffff';
+        context.font = '35px Arial';
+        context.textAlign = 'center';
+        context.fillText('好友排行', 750 / 2, OBJsize.frends.top+40);
+    }else if (type === 3){
+        // 群排行
+        RoundRect(OBJsize.frends.left,OBJsize.frends.top,OBJsize.frends.width,100,30,context,OBJsize.frends.titleColor);//标题框
+        context.fillStyle = '#ffffff';
+        context.font = '35px Arial';
+        context.textAlign = 'center';
+        context.fillText('群排行榜', 750 / 2, OBJsize.frends.top+40);
+    }
+    reDrawItem(0);
 }
 
 // 绘制自己的排名
@@ -297,11 +345,11 @@ function drawMyRank() {
 
 // 渲染好友排行榜 canvas
 function reDrawItem(y) {
-  context.clearRect(80, OBJsize.frends.top+60, 750 - 80 * 2, 620);// 清空
+  context.clearRect(OBJsize.frends.left, OBJsize.frends.top+60, OBJsize.frends.width, OBJsize.frends.height);// 清空
   context.fillStyle = '#ffffff';// 背景色
-  context.fillRect(80, OBJsize.frends.top+60, 750 - 80 * 2, 590);// 矩形背景
-  RoundRect(80,OBJsize.frends.top+60,750 - 80 * 2,620,30,context,"#ffffff");// 圆角矩形背景
-  context.drawImage(itemCanvas, 0, y, 750 - 80 * 2, 590, 80, + OBJsize.frends.top+60, 750 - 80 * 2, 590);// 裁剪排行榜离屏canvas
+  context.fillRect(OBJsize.frends.left, OBJsize.frends.top+60, OBJsize.frends.width, OBJsize.frends.height-30);// 矩形背景
+  RoundRect(OBJsize.frends.left,OBJsize.frends.top+60,OBJsize.frends.width,OBJsize.frends.height,30,context,"#ffffff");// 白色圆角矩形背景
+  context.drawImage(itemCanvas, 0, y, OBJsize.frends.width, OBJsize.frends.height-30, OBJsize.frends.left, + OBJsize.frends.top+60, OBJsize.frends.width, OBJsize.frends.height-30);// 裁剪排行榜离屏canvas
 }
 
 // 快速排序
@@ -336,7 +384,6 @@ function getUserInfo() {
     lang: 'zh_CN',
     success: res => {
       myInfo = res.data[0];
-      console.log(myInfo);
     },
     fail: res => {
     }
@@ -386,7 +433,7 @@ function getFriendsRanking(type,callback) {
     keyList: ['score', 'maxScore'],
     success: res => {
       let data = res.data;
-      if(type === "render")initRanklist(sortByScore(data));
+      if(type === "render")initRanklist(sortByScore(data),2);
       if(!!callback)callback(sortByScore(data));// 传入排序后的好友数据
     },
     fail: err => {
@@ -401,14 +448,10 @@ function getGroupRanking(ticket) {
     shareTicket: ticket,
     keyList: ['score', 'maxScore'],
     success: res => {
-      console.log('getGroupCloudStorage:success');
-      console.log(res.data);
       let data = res.data;
       render(3,data);
     },
     fail: res => {
-      console.log('getGroupCloudStorage:fail');
-      console.log(res.data);
     }
   });
 }
@@ -436,38 +479,77 @@ function event(){
         console.log("传入开放域的数据为===========",res);
         if(!res.type){console.info("请传入需要开启的面板类型");return;}
 
+        // 得分面板
         if (Number(res.type) === 1) {
-            // 得分面板
-            if(res.data.score){
+            if(res.data.score||Number(res.data.score)===0){
                 _score = Number(res.data.score);
+                if("style" in res && "top" in res.style){
+                    OBJsize.bg.y = res.style.top;
+                    OBJsize.bg1.y = res.style.top+300-30;
+                }
                 render(1);
-            }else{
+            }
+            else{
                 console.log("未传入分数");
             }
-        }else if(Number(res.type) === 2){
-            // 好友排行
+        }
+        // 好友排行
+        else if(Number(res.type) === 2){
+            if("style" in res && "top" in res.style){
+                OBJsize.frends.top = res.style.top;
+            }
+            if("style" in res && "titleColor" in res.style){
+                OBJsize.frends.titleColor = res.style.titleColor;
+            }
             render(2);
-        }else if (Number(res.type) === 3) {
-            // 群排行
+        }
+        // 群排行
+        else if (Number(res.type) === 3) {
+            if("style" in res && "top" in res.style){
+                OBJsize.frends.top = res.style.top;
+            }
+            if("style" in res && "titleColor" in res.style){
+                OBJsize.frends.titleColor = res.style.titleColor;
+            }
             if(res.data.shareTicket){
                 getGroupRanking(res.data.shareTicket);
-            }else{
-                console.log("无群分享shareTicket字段");
             }
-        } else if (Number(res.type) === 4) {
-            if(res.data.close){
+            else{
+                console.log("未传入shareTicket字段");
+            }
+        }
+        // 比分面板
+        else if (Number(res.type) === 4) {
+            if('close' in res){
                 // 关闭比分面板
                 _match_content.status = false;
-            }else if(res.data.score){
-                // 开启比分面板
-                _match_content.status = true;
-                _match_content.score = res.data.score;
-                if(!!res.style.top)_match_content.top=res.style.top;
-                if(!!res.style.left)_match_content.left=res.style.left;
-                render(4);
-            }else{
-                console.log("未传入当前得分");
+                context.clearRect(_match_content.left,_match_content.top,_match_content.width,_match_content.height);
+                render(_renderStatus);
             }
+            else if('effect' in res){
+                // 开启并初始化比分面板
+                if('style' in res){
+                    if(!!res.style.top&&res.style.top<=1130)_match_content.top=res.style.top;
+                    if(!!res.style.left&&res.style.left<=600)_match_content.left=res.style.left;
+                    if(!!res.style.height&&res.style.height>=250)_match_content.height=res.style.height;
+                    if(!!res.style.width&&res.style.width>=150)_match_content.width=res.style.width;
+                }
+                // 如果带分数就渲染
+                if('data' in res && 'score' in res.data){
+                    render();
+                }
+                _match_content.status = true;
+            }
+            else if('data' in res && 'score' in res.data){
+                // 更新比分面板
+                _match_content.score = res.data.score;//当前玩家实时分数
+                render();
+            }
+        }
+        // 清空全部内容
+        else if(Number(res.type) === 5){
+            _renderStatus = 5;
+            context.clearRect(0,0,750,1280);
         }
     });
 }
@@ -499,30 +581,3 @@ function touch(){
     });
 }
 
-// ui元素坐标信息
-var OBJsize = {
-    // 好友排行榜
-    frends: {
-        top: 300,// 好友排行榜Y轴坐标
-        titleColor: "#3ec9ff"// “好友排行” 背景色
-    },
-    // 得分面板主背景
-    bg: {
-        w: Math.round(750 - 80 * 2),
-        h: 620,
-        x: 80,
-        y: 350
-    },
-    // 得分面板子背景
-    bg1: {
-        w: Math.round(750 - 80 * 2.7),
-        h: 320,
-        x: ((750 - 80 * 2)-(750 - 80 * 2.7))/2+80,
-        y: 350+300-30
-    },
-    // 得分面板玩家头像
-    item1: {
-        w: Math.round(150),
-        h: Math.round(150)
-    },
-};

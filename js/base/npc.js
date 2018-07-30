@@ -18,12 +18,15 @@ export default class npc{
 		/* 总时间 */
 		this.time = GLOBAL.Level[Level].time*1000;
 		/* 当前时间 */
-		this.currentTime = GLOBAL.Level[Level].time*1000;
+		this.currentTime = GLOBAL.Level[Level].time;
 
-		this.Worm1 = new Image();// 虫子对象1
-        this.Worm1.src = "images/Worm1.png";
-        this.Worm2 = new Image();// 虫子对象2
-        this.Worm2.src = "images/Worm2.png";
+		/* 血条背景 */
+		this.bloodbg = new Image();
+		this.bloodbg.src = "images/bar/yellow_bg.png";
+		this.bloodbg2 = new Image();
+		this.bloodbg2.src = "images/bar/bar_bg.png";
+		this.bloodbg3 = new Image();
+		this.bloodbg3.src = "images/bar/bar.png";
 	}
 	// 更新贴图
 	update(src){
@@ -68,25 +71,14 @@ export default class npc{
 		this.y = screenHeight-160		
 	}
 
-	// 时间条和敌人位置渲染
+	// 血条渲染
 	renderLifebar(){
 		this.blood = this.blood - this.Enemy;// 递减生命值
-		// 绘制时间条
-		this.ctx.fillStyle = "#222";
-		this.ctx.fillRect(screenWidth/2-95,30,190,30);
-		this.ctx.fillStyle = "red";
-
-		this.ctx.fillRect(screenWidth/2-90,35,180*(this.blood/this.hp_max),20);
-        // 阴影
-        this.ctx.shadowColor = "#101500";
-        this.ctx.shadowOffsetX = 8;
-        this.ctx.shadowOffsetY = 8;
-        this.ctx.shadowBlur= 5;
-		// 绘制敌人
-		this.ctx.drawImage(this.WormType?this.Worm1:this.Worm2,screenWidth/2-50,(screenHeight-120)*(this.blood/this.hp_max),100,90);
-		// 关闭阴影
-        this.ctx.shadowOffsetX = 0;
-        this.ctx.shadowOffsetY = 0;
-        this.ctx.shadowBlur= 0;
+		// 时间条背景
+		this.ctx.drawImage(this.bloodbg,screenWidth/2-95,30,190,30);
+		// 底色背景
+		this.ctx.drawImage(this.bloodbg2,screenWidth/2-90,35,180,20);
+		// 时间条
+		this.ctx.drawImage(this.bloodbg3,screenWidth/2-90,35,180*(this.blood/this.hp_max),20);
 	}
 }

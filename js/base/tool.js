@@ -16,4 +16,28 @@ export default class TOOLS{
             })
         }
     }
+    // 绘制圆角矩形
+    RoundRect(x, y, w, h, r,target,color,storke,lineWidth){
+        if (w < 2 * r) {r = w / 2;}
+        if (h < 2 * r){ r = h / 2;}
+        target.beginPath();
+        target.moveTo(x+r, y);
+        target.arcTo(x+w, y, x+w, y+h, r);
+        target.arcTo(x+w, y+h, x, y+h, r);
+        target.arcTo(x, y+h, x, y, r);
+        target.arcTo(x, y, x+w, y, r);
+        target.closePath();
+        if(storke){
+            let _ = target.strokeStyle;
+            target.strokeStyle=color;
+            !!lineWidth?target.lineWidth=lineWidth:target.lineWidth=5;
+            target.stroke();
+            target.strokeStyle = _;
+        }else{
+            let _ = target.fillStyle;
+            target.fillStyle = color;
+            target.fill();
+            target.fillStyle = _;
+        }
+    }
 }

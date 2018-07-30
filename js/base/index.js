@@ -7,9 +7,11 @@ const _URL = {
     share: "images/currency/share.png",
     rankList: "images/currency/rank_list.png",
     game: "images/currency/game.png",
+    close: "images/currency/close_btn.png",
     btnsize: {width:70,height:90},// 按钮尺寸
     logosize: {width:250,height:120},
     playsize: {width:200,height:80},
+    closesize: {width:30,height:30}
 };
 
 export default class index{
@@ -20,11 +22,22 @@ export default class index{
         this.share = this.createBtn(_URL.share);
         this.rankList = this.createBtn(_URL.rankList);
         this.game = this.createBtn(_URL.game);
+        this.close = this.createBtn(_URL.close);
     }
     createBtn(src){
         let img = new Image();
         img.src = src;
         return img;
+    }
+    // 好友排行榜UI
+    renderclose(){
+        this.ctx.drawImage(this.close,screenWidth*.85,screenHeight*.18,_URL.closesize.width,_URL.closesize.height); 
+        this.closeRange = {
+            startX: screenWidth*.85,
+            startY: screenHeight*.18,
+            endX  : screenWidth*.85+_URL.closesize.width,
+            endY  : screenHeight*.18+_URL.closesize.height
+        }       
     }
     render(){
         this.ctx.drawImage(this.logo,screenWidth/2-_URL.logosize.width/2,screenHeight/10,_URL.logosize.width,_URL.logosize.height);
