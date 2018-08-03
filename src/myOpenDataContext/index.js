@@ -1,53 +1,18 @@
-// ui元素坐标信息
-var OBJsize = {
-    // 好友排行与群排行ui
-    frends: {
-        width: 590,
-        height: 620,
-        top: 300,// Y轴坐标
-        left: 80,// X轴坐标
-        titleColor: "#3ec9ff"// “好友排行” 背景色
-    },
-    // 得分面板主背景
-    bg: {
-        w: 590,
-        h: 620,
-        x: 80,
-        y: 350
-    },
-    // 得分面板子背景
-    bg1: {
-        w: Math.round(750 - 80 * 2.7),
-        h: 320,
-        x: ((750 - 80 * 2)-(750 - 80 * 2.7))/2+80,
-        y: 350+300-30
-    },
-    // 得分面板玩家头像
-    item1: {
-        w: Math.round(150),
-        h: Math.round(150)
-    },
-};
+// 正式环境部署时清空托管数据
+//wx.removeUserCloudStorage({keyList: ['score', 'maxScore'],success: data => console.log(data)})
 
-// 比分面板 元素定位信息
-var _match_content = {
-    initData: [],// 待超越好友
-    status: false,
-    width: 120,
-    height: 170,
-    top: 150,
-    left: 630,
-    score: 0 // 玩家实时分数
-};
+// 模拟数据
+let _data = [{avatarUrl:"https://wx.qlogo.cn/mmopen/vi_32/yPPmic7ZiaJaVoadiaAicksQv0O17ocQNAGdSSkVCpkW2Sm6U4nF3yicQNaIZtdJgDdvgU16gNUUHib61PsE2SIZNOyw/132",nickname:"云帆智能管家啊啥地方看见哈萨克的肌肤啊啥的就发货啊健康的合法会计师的饭卡就巅峰时刻",openid:"123",score:"81"},{avatarUrl:"https://wx.qlogo.cn/mmopen/vi_32/yPPmic7ZiaJaVoadiaAicksQv0O17ocQNAGdSSkVCpkW2Sm6U4nF3yicQNaIZtdJgDdvgU16gNUUHib61PsE2SIZNOyw/132",nickname:"云帆智能管家",openid:"123",score:"81"},{avatarUrl:"https://wx.qlogo.cn/mmopen/vi_32/yPPmic7ZiaJaVoadiaAicksQv0O17ocQNAGdSSkVCpkW2Sm6U4nF3yicQNaIZtdJgDdvgU16gNUUHib61PsE2SIZNOyw/132",nickname:"云帆智能管家",openid:"123",score:"81"},{avatarUrl:"https://wx.qlogo.cn/mmopen/vi_32/yPPmic7ZiaJaVoadiaAicksQv0O17ocQNAGdSSkVCpkW2Sm6U4nF3yicQNaIZtdJgDdvgU16gNUUHib61PsE2SIZNOyw/132",nickname:"云帆智能管家",openid:"123",score:"81"},{avatarUrl:"https://wx.qlogo.cn/mmopen/vi_32/yPPmic7ZiaJaVoadiaAicksQv0O17ocQNAGdSSkVCpkW2Sm6U4nF3yicQNaIZtdJgDdvgU16gNUUHib61PsE2SIZNOyw/132",nickname:"云帆智能管家",openid:"123",score:"81"},{avatarUrl:"https://wx.qlogo.cn/mmopen/vi_32/yPPmic7ZiaJaVoadiaAicksQv0O17ocQNAGdSSkVCpkW2Sm6U4nF3yicQNaIZtdJgDdvgU16gNUUHib61PsE2SIZNOyw/132",nickname:"云帆智能管家",openid:"123",score:"81"},{avatarUrl:"https://wx.qlogo.cn/mmopen/vi_32/yPPmic7ZiaJaVoadiaAicksQv0O17ocQNAGdSSkVCpkW2Sm6U4nF3yicQNaIZtdJgDdvgU16gNUUHib61PsE2SIZNOyw/132",nickname:"云帆智能管家",openid:"123",score:"81"},{avatarUrl:"https://wx.qlogo.cn/mmopen/vi_32/yPPmic7ZiaJaVoadiaAicksQv0O17ocQNAGdSSkVCpkW2Sm6U4nF3yicQNaIZtdJgDdvgU16gNUUHib61PsE2SIZNOyw/132",nickname:"云帆智能管家",openid:"123",score:"81"},{avatarUrl:"https://wx.qlogo.cn/mmopen/vi_32/yPPmic7ZiaJaVoadiaAicksQv0O17ocQNAGdSSkVCpkW2Sm6U4nF3yicQNaIZtdJgDdvgU16gNUUHib61PsE2SIZNOyw/132",nickname:"云帆智能管家",openid:"123",score:"81"},{avatarUrl:"https://wx.qlogo.cn/mmopen/vi_32/yPPmic7ZiaJaVoadiaAicksQv0O17ocQNAGdSSkVCpkW2Sm6U4nF3yicQNaIZtdJgDdvgU16gNUUHib61PsE2SIZNOyw/132",nickname:"云帆智能管家",openid:"123",score:"81"},{avatarUrl:"https://wx.qlogo.cn/mmopen/vi_32/yPPmic7ZiaJaVoadiaAicksQv0O17ocQNAGdSSkVCpkW2Sm6U4nF3yicQNaIZtdJgDdvgU16gNUUHib61PsE2SIZNOyw/132",nickname:"云帆智能管家",openid:"123",score:"81"},{avatarUrl:"https://wx.qlogo.cn/mmopen/vi_32/yPPmic7ZiaJaVoadiaAicksQv0O17ocQNAGdSSkVCpkW2Sm6U4nF3yicQNaIZtdJgDdvgU16gNUUHib61PsE2SIZNOyw/132",nickname:"云帆智能管家",openid:"123",score:"81"},{avatarUrl:"https://wx.qlogo.cn/mmopen/vi_32/yPPmic7ZiaJaVoadiaAicksQv0O17ocQNAGdSSkVCpkW2Sm6U4nF3yicQNaIZtdJgDdvgU16gNUUHib61PsE2SIZNOyw/132",nickname:"云帆智能管家",openid:"123",score:"81"},{avatarUrl:"https://wx.qlogo.cn/mmopen/vi_32/yPPmic7ZiaJaVoadiaAicksQv0O17ocQNAGdSSkVCpkW2Sm6U4nF3yicQNaIZtdJgDdvgU16gNUUHib61PsE2SIZNOyw/132",nickname:"云帆智能管家",openid:"123",score:"81"},{avatarUrl:"https://wx.qlogo.cn/mmopen/vi_32/yPPmic7ZiaJaVoadiaAicksQv0O17ocQNAGdSSkVCpkW2Sm6U4nF3yicQNaIZtdJgDdvgU16gNUUHib61PsE2SIZNOyw/132",nickname:"云帆智能管家",openid:"123",score:"81"}]
+wx.datas = _data;
 
 // 主屏sharedCanvas
 let sharedCanvas = wx.getSharedCanvas();
 let context = sharedCanvas.getContext("2d");
-// 普通离屏canvas 好友排行榜 群排行榜
+// 普通离屏canvas 
 let itemCanvas = wx.createCanvas();
 let ctx = itemCanvas.getContext('2d');
 
-// 设备实际尺寸和缩放
+// 缩放矩阵
 const screenWidth = wx.getSystemInfoSync().screenWidth;
 const screenHeight = wx.getSystemInfoSync().screenHeight;
 const ratio = wx.getSystemInfoSync().pixelRatio;
@@ -60,59 +25,120 @@ let _renderStatus = 0;//渲染状态
 let myself = {};// 玩家自身信息
 let _score =0;//当前分数
 
-init();
+// 设计宽高 
+let _SIZE = {
+    w: 720,
+    h: 1280,
+    direction: 1 //1竖屏 0横屏
+}
+
+direction();// 横竖屏判断
+
+// ui元素坐标信息
+let OBJsize = {
+    // 好友排行与群排行ui
+    frends: {
+        width: _SIZE.direction?590:640,
+        height: _SIZE.direction?620:420,
+        top: _SIZE.direction?300:100,// Y轴坐标
+        left: _SIZE.direction?80:320,// X轴坐标
+        titleColor: "#302f30"// “好友排行” 背景色
+    },
+    // 得分面板主背景
+    bg: {
+        w: _SIZE.direction?590:640,
+        h: _SIZE.direction?620:490,
+        x: _SIZE.direction?80:320,
+        y: _SIZE.direction?350:100
+    },
+    // 得分面板子背景
+    bg1: {
+        w: _SIZE.direction?531:576,
+        h: _SIZE.direction?310:582,
+        x: _SIZE.direction?80+(590-531)/2:320+(640-576)/2,
+        y: _SIZE.direction?350+620-20:100+490-20
+    },
+    // 得分面板玩家头像
+    item1: {
+        w: Math.round(150),
+        h: Math.round(150)
+    },
+};
+
+// 比分面板 元素定位信息
+let _match_content = {
+    initData: [],// 待超越好友
+    status: false,
+    width: 120,
+    height: 170,
+    top: 150,
+    left: 630,
+    score: 0 // 玩家实时分数
+};
+
+setTimeout(()=>{init()},1000);
 
 // 初始化
 function init() {
+  console.log("排行榜开启成功");
   // canvas适配
   context.restore();
   context.scale(ratio, ratio);
   context.clearRect(0, 0, screenWidth * ratio, screenHeight * ratio);
-  let scales = screenWidth / 750;
-  context.scale(scales, screenHeight / 1280);
-  // 获取好友数据
-  getTimeFriend();
+  let scales = screenWidth / _SIZE.w;
+  context.scale(scales, scales);
+  // 获取当前用户信息
+  getUserInfo();
   // 数据事件
   event();
   // 触摸滑动
   touch();
-  console.log("排行榜开启成功")
+  // 获取比分好友数据
+  getTimeFriend();
+}
+
+// 横竖屏判断
+function direction(){
+    if(screenWidth>screenHeight){
+        console.log("= 已经切换为横版排行榜 =");
+        _SIZE.w = [_SIZE.h,[_SIZE.h = _SIZE.h=_SIZE.w]][0];
+        _SIZE.direction = 0;
+    }
 }
 
 // 获取全部待超越好友数据
 function getTimeFriend(){
     getFriendsRanking("score",(data)=>{
-        myself = data[myRank-1];//玩家自己信息
-        _match_content.initData = data.slice(0,myRank-1);
+        //console.log("获取比分数据",data);
+        _match_content.initData = data;
+        console.log(data);
     });
 }
 
 // 分析下一个待超越好友
 function scorecompare(){
-    let content = null,type = 1;
-    if(!_match_content.score||!_match_content.initData)content =  myself;
-    let _ = ()=>{
-        if(_match_content.initData.length<=0){content = myself;type=2}//达到第一名
-        else{
-            let target = Number(_match_content.initData[_match_content.initData.length-1].score);
-            if(Number(_match_content.score)>target){
-                _match_content.initData.pop();//删除已经超过的好友
-                _();// 递归
-            }
-            else{
-                content =  _match_content.initData[_match_content.initData.length-1]
-            }
-        }
-    };
-    _();
-    return {data:content,type:type};
+    var a = _match_content.initData.findIndex(item=>{
+        //console.log(Number(item.score),Number(_match_content.score));
+        return Number(item.score)<Number(_match_content.score);
+    })
+    //console.log(a);
+    if(a === -1){
+        //console.log("未超越任何人");
+        return {data:_match_content.initData[_match_content.initData.length-1],type:1};
+    }else if(a === 0){
+        //console.log("第一名");
+        return {data:myInfo,type:2};
+    }else{
+        //console.log("即将超越",_match_content.initData[a-1]);
+        return {data:_match_content.initData[a-1],type:1};
+    }
 }
 
 // 渲染函数
 function render(type,data) {
     _renderStatus = type;// 切换渲染状态
     context.restore();// 状态还原
-    context.clearRect(0, 0, 750, 1280);//清空像素
+    context.clearRect(0, 0, _SIZE.w, _SIZE.h);//清空像素
     // 好友比分
     if(_match_content.status){
         let _ = scorecompare(); // 即将超越的玩家
@@ -166,6 +192,7 @@ function render(type,data) {
                 let bg1 = wx.createImage();
                 bg1.src = "tips/bg1.png";
                 bg1.onload =function(){
+                    console.log(_size.bg1)
                     context.drawImage(bg1, _size.bg1.x, _size.bg1.y, _size.bg1.w,_size.bg1.h);
                     context.font = "14px";
                     // 分数
@@ -254,49 +281,61 @@ function itemRender(size){
 
 // 好友排行榜 群排行榜渲染
 function initRanklist(list,type) {
-    console.log(list);
+    //console.log(list);
   if(Number(_renderStatus) != 2 && Number(_renderStatus) !=  3)return;
-  let length = Math.max(list.length, 6);// 最少渲染6条
+  let length = Math.max(list.length, _SIZE.direction?6:12);// 最少渲染6条或12条
 
   // 离屏canvas尺寸
-  let itemHeight = 590 / 6;// 单行高度
-  itemCanvas.width = (750 - 80 * 2);
+  let itemHeight = _SIZE.direction?OBJsize.frends.width / 6:OBJsize.frends.width / 12;// 单行高度
+  itemCanvas.width = OBJsize.frends.width;
   itemCanvas.height = itemHeight * length;
 
   // 用户背景框绘制
   for (let i = 0; i < length; i++) {
     if (i % 2 === 0) {
-      ctx.fillStyle = '#ffffff';
+      ctx.fillStyle = '#302f30';
     } else {
-      ctx.fillStyle = '#f6f6f6';
+      ctx.fillStyle = '#393739';
     }
     ctx.fillRect(0, i * itemHeight, itemCanvas.width, itemHeight);
   }
-
+  ctx.fillStyle = '#302f30';
   // 用户头像
   if (list && list.length > 0) {
     list.map((item, index) => {
       let avatar = wx.createImage();
       avatar.src = item.avatarUrl;
       avatar.onload = function () {
-        ctx.drawImage(avatar, 100, index * itemHeight + 14 , 70, 70);
+        let _y = _SIZE.direction?index * itemHeight + 14:index * itemHeight + 5;
+        let _userSize = _SIZE.direction?70:40;
+        ctx.drawImage(avatar, 100,  _y, _userSize, _userSize);
         reDrawItem(0);
       };
-      ctx.fillStyle = '#3b3b3b';
-      ctx.font = '28px Arial';
+      ctx.fillStyle = '#ffffff';
+      ctx.font = _SIZE.direction?'25px Arial':'20px Arial';
       ctx.textAlign = 'left';
+      // 字体截取
+      let name = item.nickname;//姓名
+      if(name.length>=10)name = name.substr(0,10);
       // 姓名
-      ctx.fillText(item.nickname, 190, index * itemHeight + 54 );
-      ctx.font = 'bold 36px Arial';
+      ctx.fillText(name, 190, _SIZE.direction?index * itemHeight + 58:index * itemHeight + 35);
+      ctx.font = _SIZE.direction?'bold 30px Arial':'bold 25px Arial';
       ctx.textAlign = 'right';
-      ctx.fillStyle = '#ff685f';
+      ctx.fillStyle = '#ffffff';
       // 分数
-      ctx.fillText(item.score || 0, 550, index * itemHeight + 60 );
-      ctx.font = 'italic 44px Arial';
-      ctx.fillStyle = '#3b3b3b';
+      ctx.fillText(item.score || 0, 550, _SIZE.direction?index * itemHeight + 60 :index * itemHeight + 35 );
+      ctx.font = _SIZE.direction?'italic bold 30px Arial':'italic bold 25px Arial';
+      ctx.fillStyle = '#cccccc';
       ctx.textAlign = 'center';
+      if(index + 1 === 1){
+            ctx.fillStyle = '#e76611';
+      }else if(index + 1 === 2){
+            ctx.fillStyle = '#dba046';
+      }else if(index + 1 === 3){
+            ctx.fillStyle = '#dbc631';
+      }
       // 排名
-      ctx.fillText(index + 1, 46, index * itemHeight + 64 )
+      ctx.fillText(index + 1, 46, _SIZE.direction?index * itemHeight + 60 :index * itemHeight + 35)
     });
   } else {
     // 没有数据
@@ -305,16 +344,16 @@ function initRanklist(list,type) {
         // 好友面板
         RoundRect(OBJsize.frends.left,OBJsize.frends.top,OBJsize.frends.width,100,30,context,OBJsize.frends.titleColor);//标题框
         context.fillStyle = '#ffffff';
-        context.font = '35px Arial';
+        context.font = 'bold 30px Arial';
         context.textAlign = 'center';
-        context.fillText('好友排行', 750 / 2, OBJsize.frends.top+40);
+        context.fillText('好友排行', _SIZE.w / 2, OBJsize.frends.top+40);
     }else if (type === 3){
         // 群排行
         RoundRect(OBJsize.frends.left,OBJsize.frends.top,OBJsize.frends.width,100,30,context,OBJsize.frends.titleColor);//标题框
         context.fillStyle = '#ffffff';
-        context.font = '35px Arial';
+        context.font = 'bold 30px Arial';
         context.textAlign = 'center';
-        context.fillText('群排行榜', 750 / 2, OBJsize.frends.top+40);
+        context.fillText('群排行榜', _SIZE.w / 2, OBJsize.frends.top+40);
     }
     reDrawItem(0);
 }
@@ -346,68 +385,73 @@ function drawMyRank() {
 // 渲染好友排行榜 canvas
 function reDrawItem(y) {
   context.clearRect(OBJsize.frends.left, OBJsize.frends.top+60, OBJsize.frends.width, OBJsize.frends.height);// 清空
-  context.fillStyle = '#ffffff';// 背景色
+  context.fillStyle = '#302f30';// 背景色
   context.fillRect(OBJsize.frends.left, OBJsize.frends.top+60, OBJsize.frends.width, OBJsize.frends.height-30);// 矩形背景
-  RoundRect(OBJsize.frends.left,OBJsize.frends.top+60,OBJsize.frends.width,OBJsize.frends.height,30,context,"#ffffff");// 白色圆角矩形背景
+  RoundRect(OBJsize.frends.left,OBJsize.frends.top+60,OBJsize.frends.width,OBJsize.frends.height,30,context,"#302f30");// 白色圆角矩形背景
   context.drawImage(itemCanvas, 0, y, OBJsize.frends.width, OBJsize.frends.height-30, OBJsize.frends.left, + OBJsize.frends.top+60, OBJsize.frends.width, OBJsize.frends.height-30);// 裁剪排行榜离屏canvas
 }
 
 // 快速排序
 function sortByScore(data) {
+    //console.log("源数据",data);
   let array = [];
   data.map(item => {
-
     array.push({
       avatarUrl: item.avatarUrl,
       nickname: item.nickname,
       openid: item.openid,
       score: item['KVDataList'][1] && item['KVDataList'][1].value != 'undefined' ? item['KVDataList'][1].value : (item['KVDataList'][0] ? item['KVDataList'][0].value : 0) // 取最高分
     })
-
   });
+  //console.log("选取最高分",array);
   array.sort((a, b) => {
-    return a['score'] < b['score'];
+    return Number(b['score']) - Number(a['score']);
   });
+  //console.log("排序好的数组",array);
+  // 玩家名次
   myRank = array.findIndex((item) => {
     return item.nickname === myInfo.nickName && item.avatarUrl === myInfo.avatarUrl;
   });
-  if (myRank === -1)
-    myRank = array.length;
+  //console.log("玩家排名",myRank);
+  if (myRank === -1)myRank = array.length;// 如果没有玩家数据则当作最后一名
 
   return array;
 }
 
 // 获取当前用户信息
-function getUserInfo() {
+function getUserInfo(callback) {
   wx.getUserInfo({
     openIdList: ['selfOpenId'],
     lang: 'zh_CN',
     success: res => {
-      myInfo = res.data[0];
+        //console.log("玩家信息",res);
+        myInfo = res.data[0];
+        if(!!callback)callback(res);
     },
     fail: res => {
+        console.log("!!!!注意无法获取好友数据");
     }
   })
 }
 
-// 获取当前玩家分数
+// 更新当前玩家分数
 function getMyScore(callback) {
   wx.getUserCloudStorage({
     keyList: ['score', 'maxScore'],
     success: res => {
       let data = res;
       let lastScore = _score;// 取当前分数
-      // 新用户
+      // 新用户 
       if (!data.KVDataList[1]) {
-        saveMaxScore(lastScore);
+        saveMaxScore(lastScore,true);// 创建新字段 
         myScore = lastScore;
-      } else if (lastScore > data.KVDataList[1].value) {
+      } else if (lastScore > Number(data.KVDataList[1].value)) {
         // 更新最高分
         saveMaxScore(lastScore);
         myScore = lastScore;
       } else {
       // 未超过最高分
-        myScore = data.KVDataList[1].value;
+        myScore = Number(data.KVDataList[1].value);
       }
       if(callback)callback();
     }
@@ -415,16 +459,19 @@ function getMyScore(callback) {
 }
 
 // 修改最高分数
-function saveMaxScore(maxScore) {
-  wx.setUserCloudStorage({
-    KVDataList: [{ 'key': 'maxScore', 'value': ('' + maxScore) }],
-    success: res => {
-      console.log(res,"已更新最高分");
-    },
-    fail: res => {
-      console.log(res,"分数无法更新请检查appid权限");
-    }
-  });
+function saveMaxScore(maxScore,newUser) {
+    // 如果是新用户则创建新字段
+    let __ = [{ 'key': 'maxScore', 'value': ('' + maxScore) }];
+    if(!!newUser)__ = [{ 'key': 'maxScore', 'value': ('' + maxScore) },{ 'key': 'score', 'value': ('' + maxScore) }];
+    wx.setUserCloudStorage({
+        KVDataList: __,
+        success: res => {
+          console.log(res,"已更新最高分");
+        },
+        fail: res => {
+          console.log(res,"分数无法更新请检查appid权限");
+        }
+      });
 }
 
 // 好友排行榜
@@ -477,12 +524,12 @@ function RoundRect(x, y, w, h, r,target,color){
 function event(){
     wx.onMessage(res => {
         console.log("传入开放域的数据为===========",res);
-        if(!res.type){console.info("请传入需要开启的面板类型");return;}
+        if(!res.type){console.info("请传入typez字段");return;}
 
         // 得分面板
         if (Number(res.type) === 1) {
             if(res.data.score||Number(res.data.score)===0){
-                _score = Number(res.data.score);
+                _score = Number(res.data.score);// 记录当前得分
                 if("style" in res && "top" in res.style){
                     OBJsize.bg.y = res.style.top;
                     OBJsize.bg1.y = res.style.top+300-30;
@@ -542,14 +589,14 @@ function event(){
             }
             else if('data' in res && 'score' in res.data){
                 // 更新比分面板
-                _match_content.score = res.data.score;//当前玩家实时分数
+                _match_content.score = Number(res.data.score);//当前玩家实时分数
                 render();
             }
         }
         // 清空全部内容
         else if(Number(res.type) === 5){
             _renderStatus = 5;
-            context.clearRect(0,0,750,1280);
+            context.clearRect(0,0,_SIZE.w,_SIZE.h);
         }
     });
 }
@@ -569,11 +616,11 @@ function touch(){
         }
     });
     wx.onTouchEnd(e => {
-        startY = undefined;
+        startY = undefined;let _MAXY = _SIZE.direction?itemCanvas.height - OBJsize.frends.width:itemCanvas.height - OBJsize.frends.width*.6;
         if (moveY < 0) { // 到顶
             moveY = 0;
-        } else if (moveY > itemCanvas.height - 590) { // 到底
-            moveY = itemCanvas.height - 590;
+        } else if (moveY >  _MAXY) { // 到底
+            moveY =  _MAXY;
         }
         if(_renderStatus === 2 || _renderStatus === 3) {
             reDrawItem(moveY);
