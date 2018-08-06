@@ -332,14 +332,14 @@ function initRanklist(list,type) {
         context.fillStyle = '#ffffff';
         context.font = 'bold 30px Arial';
         context.textAlign = 'center';
-        context.fillText('好友排行', _SIZE.w / 2, OBJsize.frends.top+40);
+        context.fillText('好友排行', OBJsize.frends.left+OBJsize.frends.width / 2, OBJsize.frends.top+40);
     }else if (type === 3){
         // 群排行
         RoundRect(OBJsize.frends.left,OBJsize.frends.top,OBJsize.frends.width,100,30,context,OBJsize.frends.titleColor);//标题框
         context.fillStyle = '#ffffff';
         context.font = 'bold 30px Arial';
         context.textAlign = 'center';
-        context.fillText('群排行榜', _SIZE.w / 2, OBJsize.frends.top+40);
+        context.fillText('群排行榜', OBJsize.frends.left+OBJsize.frends.width / 2, OBJsize.frends.top+40);
     }
     reDrawItem(0);
 }
